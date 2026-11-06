@@ -11,7 +11,7 @@
     {
       "indicator_id": "GDP",
       "observation_date": "1946-01-01",
-      "value": NaN,
+      "value": null,
       "country": "US",
       "source": "fred",
       "raw_response_id": "econ_observations_gdp_20261105_171001"
@@ -19,7 +19,7 @@
     {
       "indicator_id": "GDP",
       "observation_date": "1946-04-01",
-      "value": NaN,
+      "value": null,
       "country": "US",
       "source": "fred",
       "raw_response_id": "econ_observations_gdp_20261105_171001"
@@ -27,7 +27,7 @@
     {
       "indicator_id": "GDP",
       "observation_date": "1946-07-01",
-      "value": NaN,
+      "value": null,
       "country": "US",
       "source": "fred",
       "raw_response_id": "econ_observations_gdp_20261105_171001"
@@ -35,7 +35,7 @@
     {
       "indicator_id": "GDP",
       "observation_date": "1946-10-01",
-      "value": NaN,
+      "value": null,
       "country": "US",
       "source": "fred",
       "raw_response_id": "econ_observations_gdp_20261105_171001"
