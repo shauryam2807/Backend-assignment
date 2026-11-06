@@ -1,0 +1,252 @@
+{
+  "status": "success",
+  "meta": {
+    "source": "fred",
+    "total_records": 29171,
+    "sample_size": 30,
+    "generated_at": "2026-11-05T17:12:02.637195+00:00",
+    "category": "economic_indicators"
+  },
+  "data": [
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1946-01-01",
+      "value": NaN,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1946-04-01",
+      "value": NaN,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1946-07-01",
+      "value": NaN,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1946-10-01",
+      "value": NaN,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1947-01-01",
+      "value": 243.164,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1947-04-01",
+      "value": 245.968,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1947-07-01",
+      "value": 249.585,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1947-10-01",
+      "value": 259.745,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1948-01-01",
+      "value": 265.742,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1948-04-01",
+      "value": 272.567,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1948-07-01",
+      "value": 279.196,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1948-10-01",
+      "value": 280.366,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1949-01-01",
+      "value": 275.034,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1949-04-01",
+      "value": 271.351,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1949-07-01",
+      "value": 272.889,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1949-10-01",
+      "value": 270.627,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1950-01-01",
+      "value": 280.828,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1950-04-01",
+      "value": 290.383,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1950-07-01",
+      "value": 308.153,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1950-10-01",
+      "value": 319.945,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1951-01-01",
+      "value": 336.0,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1951-04-01",
+      "value": 344.09,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1951-07-01",
+      "value": 351.385,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1951-10-01",
+      "value": 356.178,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1952-01-01",
+      "value": 359.82,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1952-04-01",
+      "value": 361.03,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1952-07-01",
+      "value": 367.701,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1952-10-01",
+      "value": 380.812,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1953-01-01",
+      "value": 387.98,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    },
+    {
+      "indicator_id": "GDP",
+      "observation_date": "1953-04-01",
+      "value": 391.749,
+      "country": "US",
+      "source": "fred",
+      "raw_response_id": "econ_observations_gdp_20261105_171001"
+    }
+  ]
+}

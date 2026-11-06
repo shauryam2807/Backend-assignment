@@ -1,0 +1,213 @@
+{
+  "status": "success",
+  "meta": {
+    "source": "frankfurter",
+    "total_records": 3591,
+    "sample_size": 25,
+    "generated_at": "2026-11-04T04:48:05.082023+00:00",
+    "category": "forex",
+    "description": "Daily exchange rates from ECB via Frankfurter API"
+  },
+  "data": [
+    {
+      "base_currency": "USD",
+      "target_currency": "AUD",
+      "rate_date": "2025-11-04",
+      "exchange_rate": 1.5396,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    },
+    {
+      "base_currency": "USD",
+      "target_currency": "CAD",
+      "rate_date": "2025-11-04",
+      "exchange_rate": 1.4079,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    },
+    {
+      "base_currency": "USD",
+      "target_currency": "CHF",
+      "rate_date": "2025-11-04",
+      "exchange_rate": 0.80889,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    },
+    {
+      "base_currency": "USD",
+      "target_currency": "EUR",
+      "rate_date": "2025-11-04",
+      "exchange_rate": 0.87025,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    },
+    {
+      "base_currency": "USD",
+      "target_currency": "GBP",
+      "rate_date": "2025-11-04",
+      "exchange_rate": 0.76538,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    },
+    {
+      "base_currency": "USD",
+      "target_currency": "INR",
+      "rate_date": "2025-11-04",
+      "exchange_rate": 88.71,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    },
+    {
+      "base_currency": "USD",
+      "target_currency": "JPY",
+      "rate_date": "2025-11-04",
+      "exchange_rate": 153.5,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    },
+    {
+      "base_currency": "USD",
+      "target_currency": "AUD",
+      "rate_date": "2025-11-05",
+      "exchange_rate": 1.5423,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    },
+    {
+      "base_currency": "USD",
+      "target_currency": "CAD",
+      "rate_date": "2025-11-05",
+      "exchange_rate": 1.413,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    },
+    {
+      "base_currency": "USD",
+      "target_currency": "CHF",
+      "rate_date": "2025-11-05",
+      "exchange_rate": 0.80987,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    },
+    {
+      "base_currency": "USD",
+      "target_currency": "EUR",
+      "rate_date": "2025-11-05",
+      "exchange_rate": 0.87017,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    },
+    {
+      "base_currency": "USD",
+      "target_currency": "GBP",
+      "rate_date": "2025-11-05",
+      "exchange_rate": 0.76662,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    },
+    {
+      "base_currency": "USD",
+      "target_currency": "INR",
+      "rate_date": "2025-11-05",
+      "exchange_rate": 88.64,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    },
+    {
+      "base_currency": "USD",
+      "target_currency": "JPY",
+      "rate_date": "2025-11-05",
+      "exchange_rate": 153.73,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    },
+    {
+      "base_currency": "USD",
+      "target_currency": "AUD",
+      "rate_date": "2025-11-06",
+      "exchange_rate": 1.5345,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    },
+    {
+      "base_currency": "USD",
+      "target_currency": "CAD",
+      "rate_date": "2025-11-06",
+      "exchange_rate": 1.4092,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    },
+    {
+      "base_currency": "USD",
+      "target_currency": "CHF",
+      "rate_date": "2025-11-06",
+      "exchange_rate": 0.80777,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    },
+    {
+      "base_currency": "USD",
+      "target_currency": "EUR",
+      "rate_date": "2025-11-06",
+      "exchange_rate": 0.86708,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    },
+    {
+      "base_currency": "USD",
+      "target_currency": "GBP",
+      "rate_date": "2025-11-06",
+      "exchange_rate": 0.76363,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    },
+    {
+      "base_currency": "USD",
+      "target_currency": "INR",
+      "rate_date": "2025-11-06",
+      "exchange_rate": 88.57,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    },
+    {
+      "base_currency": "USD",
+      "target_currency": "JPY",
+      "rate_date": "2025-11-06",
+      "exchange_rate": 153.6,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    },
+    {
+      "base_currency": "USD",
+      "target_currency": "AUD",
+      "rate_date": "2025-11-07",
+      "exchange_rate": 1.5429,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    },
+    {
+      "base_currency": "USD",
+      "target_currency": "CAD",
+      "rate_date": "2025-11-07",
+      "exchange_rate": 1.4109,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    },
+    {
+      "base_currency": "USD",
+      "target_currency": "CHF",
+      "rate_date": "2025-11-07",
+      "exchange_rate": 0.80547,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    },
+    {
+      "base_currency": "USD",
+      "target_currency": "EUR",
+      "rate_date": "2025-11-07",
+      "exchange_rate": 0.86498,
+      "source": "frankfurter",
+      "raw_response_id": "forex_historical_usd_20261104_044752"
+    }
+  ]
+}

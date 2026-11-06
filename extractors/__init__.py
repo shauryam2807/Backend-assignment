@@ -1,0 +1,4 @@
+from extractors.base_extractor import BaseExtractor
+from extractors.forex_extractor import ForexExtractor
+from extractors.crypto_extractor import CryptoExtractor
+from extractors.economic_extractor import EconomicExtractor
