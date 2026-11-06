@@ -14,204 +14,492 @@ HTML_DASHBOARD = """<!DOCTYPE html>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Inter', sans-serif; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .tab-btn.active {
+      background-color: rgb(30 41 59);
+      color: #38bdf8;
+      border-color: #0284c7;
+    }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen">
-  <!-- Navbar -->
-  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-sky-500 selection:text-white">
+  
+  <!-- Header -->
+  <header class="border-b border-slate-800/80 bg-slate-900/90 backdrop-blur sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-cyan-500 flex items-center justify-center font-bold text-xl text-slate-950">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center font-extrabold text-xl text-white shadow-lg shadow-sky-500/20">
           M
         </div>
         <div>
-          <h1 class="text-xl font-bold tracking-tight">MFAPIs Platform</h1>
-          <p class="text-xs text-slate-400">Financial Data ETL & Analytics Engine</p>
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg font-bold tracking-tight text-white">MFAPIs Platform</h1>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+              ● Live Cloud
+            </span>
+          </div>
+          <p class="text-xs text-slate-400">Financial Data ETL & Multi-Asset Intelligence</p>
         </div>
       </div>
-      <div class="flex items-center gap-4">
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          Live on Cloud
-        </span>
-        <a href="/health" target="_blank" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
-          Health Check API &rarr;
+      
+      <!-- Top Metrics Badges -->
+      <div class="flex items-center gap-2 sm:gap-3 text-xs">
+        <div class="px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700/60 hidden sm:block">
+          <span class="text-slate-400">PostgreSQL Records:</span>
+          <span class="font-bold text-white ml-1">34,600+</span>
+        </div>
+        <div class="px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700/60">
+          <span class="text-slate-400">Tests:</span>
+          <span class="font-bold text-emerald-400 ml-1">48/48 Passing</span>
+        </div>
+        <a href="/health" class="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-medium transition shadow-sm">
+          System Health
         </a>
       </div>
     </div>
   </header>
 
-  <!-- Hero -->
-  <main class="max-w-7xl mx-auto px-6 py-10 space-y-10">
-    <div class="space-y-3">
-      <h2 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-        Unified Financial Data Engine
-      </h2>
-      <p class="text-slate-400 max-w-3xl text-base leading-relaxed">
-        Autonomous ETL pipelines that acquire multi-asset financial data from public & institutional sources, normalize schemas through robust validation routines, and store over <strong class="text-white">34,600+ records</strong> in PostgreSQL.
-      </p>
-    </div>
-
-    <!-- Metrics Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <div class="p-5 rounded-2xl bg-slate-800/60 border border-slate-700/60 space-y-2">
-        <div class="flex items-center justify-between text-slate-400 text-sm">
-          <span>Forex Pipeline</span>
-          <span class="text-emerald-400 font-semibold">ECB / Frankfurter</span>
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full space-y-6">
+    
+    <!-- Hero Banner -->
+    <div class="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-slate-800/80 border border-slate-800 shadow-xl relative overflow-hidden">
+      <div class="absolute -right-12 -top-12 w-64 h-64 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="max-w-3xl space-y-2 relative z-10">
+        <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-sky-500/10 text-sky-400 text-xs font-semibold">
+          🚀 Production-Ready ETL Architecture
         </div>
-        <p class="text-3xl font-bold text-white">3,591</p>
-        <p class="text-xs text-slate-400">145 Currency Pairs &bull; 1 Year History</p>
-      </div>
-
-      <div class="p-5 rounded-2xl bg-slate-800/60 border border-slate-700/60 space-y-2">
-        <div class="flex items-center justify-between text-slate-400 text-sm">
-          <span>Crypto Engine</span>
-          <span class="text-amber-400 font-semibold">CoinGecko API</span>
-        </div>
-        <p class="text-3xl font-bold text-white">1,870</p>
-        <p class="text-xs text-slate-400">Top 50 Coins &bull; 365-Day Daily Candles</p>
-      </div>
-
-      <div class="p-5 rounded-2xl bg-slate-800/60 border border-slate-700/60 space-y-2">
-        <div class="flex items-center justify-between text-slate-400 text-sm">
-          <span>Macroeconomic Data</span>
-          <span class="text-cyan-400 font-semibold">FRED Fed Reserve</span>
-        </div>
-        <p class="text-3xl font-bold text-white">29,171</p>
-        <p class="text-xs text-slate-400">8 Key Indicators (GDP, CPI, Unemployment)</p>
-      </div>
-
-      <div class="p-5 rounded-2xl bg-slate-800/60 border border-slate-700/60 space-y-2">
-        <div class="flex items-center justify-between text-slate-400 text-sm">
-          <span>Reliability & Tests</span>
-          <span class="text-emerald-400 font-semibold">100% Pass</span>
-        </div>
-        <p class="text-3xl font-bold text-emerald-400">48 / 48</p>
-        <p class="text-xs text-slate-400">Pytest Unit & Integration Tests</p>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          Financial Data Analytics & API Explorer
+        </h2>
+        <p class="text-sm text-slate-400 leading-relaxed">
+          Interactive UI dashboard displaying live ingested data for Foreign Exchange, Cryptocurrencies, and US Macroeconomics with automated pipeline reliability and strict PostgreSQL schema validation.
+        </p>
       </div>
     </div>
 
-    <!-- Live Data Explorer Tabs -->
-    <div class="bg-slate-800/50 rounded-2xl border border-slate-700/70 overflow-hidden">
-      <div class="border-b border-slate-700/70 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+    <!-- Navigation Tabs -->
+    <div class="flex flex-wrap items-center gap-2 border-b border-slate-800 pb-2">
+      <button onclick="switchTab('forex')" id="tab-forex" class="tab-btn active px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition border border-transparent hover:border-slate-700">
+        💱 Foreign Exchange (Forex)
+      </button>
+      <button onclick="switchTab('crypto')" id="tab-crypto" class="tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition border border-transparent text-slate-400 hover:text-white hover:border-slate-700">
+        🪙 Cryptocurrency Markets
+      </button>
+      <button onclick="switchTab('economic')" id="tab-economic" class="tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition border border-transparent text-slate-400 hover:text-white hover:border-slate-700">
+        📈 Macroeconomic Indicators (FRED)
+      </button>
+      <button onclick="switchTab('docs')" id="tab-docs" class="tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition border border-transparent text-slate-400 hover:text-white hover:border-slate-700">
+        📋 Strategy & Documentation
+      </button>
+    </div>
+
+    <!-- TAB 1: FOREX -->
+    <div id="content-forex" class="tab-content space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3 p-4 rounded-xl bg-slate-900 border border-slate-800">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400 font-bold text-lg">💱</div>
+          <div>
+            <h3 class="text-sm font-bold text-white">Forex Daily Exchange Rates</h3>
+            <p class="text-xs text-slate-400">Source: European Central Bank via Frankfurter API &bull; 145 Currencies Tracked</p>
+          </div>
+        </div>
         <div class="flex items-center gap-2">
-          <span class="text-sm font-semibold text-slate-300">Live JSON Data Endpoints:</span>
-        </div>
-        <div class="flex gap-2">
-          <a href="/v1/forex/sample" target="_blank" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 hover:bg-emerald-500/20 transition">
-            💱 Forex JSON
-          </a>
-          <a href="/v1/crypto/sample" target="_blank" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-500/10 text-amber-300 border border-amber-500/20 hover:bg-amber-500/20 transition">
-            🪙 Crypto JSON
-          </a>
-          <a href="/v1/economic/sample" target="_blank" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 hover:bg-cyan-500/20 transition">
-            📈 Economic JSON
-          </a>
+          <input type="text" id="forex-search" onkeyup="filterForex()" placeholder="Filter currency..." class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500">
+          <button onclick="toggleJson('forex')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 font-medium transition border border-slate-700">
+            { } View Raw JSON
+          </button>
         </div>
       </div>
 
-      <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Forex Card -->
-        <div class="space-y-3 p-4 rounded-xl bg-slate-900/60 border border-slate-800">
-          <h3 class="font-bold text-emerald-400 flex items-center justify-between text-sm">
-            <span>Forex Exchange Rates</span>
-            <span class="text-xs text-slate-400">Normalized</span>
-          </h3>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            Multi-currency pair matrix covering USD, EUR, GBP, INR, JPY with daily close rates from European Central Bank reference pricing.
-          </p>
-          <div class="pt-2">
-            <a href="/v1/forex/sample" target="_blank" class="inline-flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300 font-semibold">
-              Inspect 25 Sample Records &rarr;
-            </a>
-          </div>
+      <!-- Raw JSON Viewer -->
+      <div id="raw-forex" class="hidden p-4 rounded-xl bg-slate-900 border border-slate-800">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-xs font-mono text-emerald-400">GET /v1/forex/sample</span>
+          <button onclick="copyJson('forex')" class="text-xs px-2.5 py-1 bg-slate-800 rounded hover:bg-slate-700 text-slate-300">Copy JSON</button>
         </div>
+        <pre class="text-[11px] font-mono text-slate-300 max-h-64 overflow-y-auto bg-slate-950 p-3 rounded-lg border border-slate-800/80" id="json-forex-pre"></pre>
+      </div>
 
-        <!-- Crypto Card -->
-        <div class="space-y-3 p-4 rounded-xl bg-slate-900/60 border border-slate-800">
-          <h3 class="font-bold text-amber-400 flex items-center justify-between text-sm">
-            <span>Cryptocurrency Markets</span>
-            <span class="text-xs text-slate-400">365-Day Timeseries</span>
-          </h3>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            Normalized OHLCV, market capitalization ranks, and rolling price change distributions for top institutional digital assets.
-          </p>
-          <div class="pt-2">
-            <a href="/v1/crypto/sample" target="_blank" class="inline-flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300 font-semibold">
-              Inspect 25 Sample Records &rarr;
-            </a>
-          </div>
-        </div>
-
-        <!-- Macro Card -->
-        <div class="space-y-3 p-4 rounded-xl bg-slate-900/60 border border-slate-800">
-          <h3 class="font-bold text-cyan-400 flex items-center justify-between text-sm">
-            <span>Macroeconomic Time Series</span>
-            <span class="text-xs text-slate-400">Institutional</span>
-          </h3>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            Real GDP, Consumer Price Index (CPI), Unemployment Rate, Fed Funds Effective Rate, and 10-Year Treasury Yields via FRED St. Louis Fed.
-          </p>
-          <div class="pt-2">
-            <a href="/v1/economic/sample" target="_blank" class="inline-flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300 font-semibold">
-              Inspect 30 Sample Records &rarr;
-            </a>
-          </div>
-        </div>
+      <!-- Forex Table -->
+      <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/60">
+        <table class="w-full text-left text-xs text-slate-300" id="forex-table">
+          <thead class="bg-slate-900 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+            <tr>
+              <th class="p-3.5">Currency Pair</th>
+              <th class="p-3.5">Exchange Rate</th>
+              <th class="p-3.5">Date</th>
+              <th class="p-3.5">Source Provider</th>
+              <th class="p-3.5">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/60" id="forex-tbody">
+            <tr><td colspan="5" class="p-6 text-center text-slate-400">Loading Forex records...</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <!-- Architecture & Features -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div class="p-6 rounded-2xl bg-slate-800/40 border border-slate-700/60 space-y-4">
-        <h3 class="font-bold text-white text-base">Key Architecture Highlights</h3>
-        <ul class="space-y-2.5 text-xs text-slate-300">
-          <li class="flex items-start gap-2">
-            <span class="text-emerald-400 font-bold">&check;</span>
-            <span><strong>Tenacity Resiliency:</strong> Exponential backoff retry logic on transient HTTP timeouts and 429 rate-limiting events.</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <span class="text-emerald-400 font-bold">&check;</span>
-            <span><strong>Zero Data Loss Storage:</strong> Raw unmodified JSON payloads persisted with timestamped audit IDs before transformation.</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <span class="text-emerald-400 font-bold">&check;</span>
-            <span><strong>PostgreSQL UPSERT:</strong> Strict unique constraint conflict resolution prevents historical record duplication.</span>
-          </li>
-        </ul>
+    <!-- TAB 2: CRYPTO -->
+    <div id="content-crypto" class="tab-content hidden space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3 p-4 rounded-xl bg-slate-900 border border-slate-800">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 rounded-lg bg-amber-500/10 text-amber-400 font-bold text-lg">🪙</div>
+          <div>
+            <h3 class="text-sm font-bold text-white">Cryptocurrency Daily Market Valuations</h3>
+            <p class="text-xs text-slate-400">Source: CoinGecko API &bull; Top 50 Global Digital Assets &bull; 365-Day Timeseries</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="text" id="crypto-search" onkeyup="filterCrypto()" placeholder="Filter asset (e.g. BTC)..." class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500">
+          <button onclick="toggleJson('crypto')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 font-medium transition border border-slate-700">
+            { } View Raw JSON
+          </button>
+        </div>
       </div>
 
-      <div class="p-6 rounded-2xl bg-slate-800/40 border border-slate-700/60 space-y-4">
-        <h3 class="font-bold text-white text-base">Deliverables & Documentation</h3>
-        <div class="grid grid-cols-2 gap-3 text-xs">
-          <div class="p-3 rounded-lg bg-slate-900/80 border border-slate-800">
-            <p class="font-semibold text-white">Source Catalogue</p>
-            <p class="text-slate-400 text-[11px]">10 asset categories, 30+ sources</p>
+      <!-- Raw JSON Viewer -->
+      <div id="raw-crypto" class="hidden p-4 rounded-xl bg-slate-900 border border-slate-800">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-xs font-mono text-amber-400">GET /v1/crypto/sample</span>
+          <button onclick="copyJson('crypto')" class="text-xs px-2.5 py-1 bg-slate-800 rounded hover:bg-slate-700 text-slate-300">Copy JSON</button>
+        </div>
+        <pre class="text-[11px] font-mono text-slate-300 max-h-64 overflow-y-auto bg-slate-950 p-3 rounded-lg border border-slate-800/80" id="json-crypto-pre"></pre>
+      </div>
+
+      <!-- Crypto Table -->
+      <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/60">
+        <table class="w-full text-left text-xs text-slate-300" id="crypto-table">
+          <thead class="bg-slate-900 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+            <tr>
+              <th class="p-3.5">Asset</th>
+              <th class="p-3.5">Price (USD)</th>
+              <th class="p-3.5">Market Capitalization</th>
+              <th class="p-3.5">24h Volume</th>
+              <th class="p-3.5">Date</th>
+              <th class="p-3.5">Provider</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/60" id="crypto-tbody">
+            <tr><td colspan="6" class="p-6 text-center text-slate-400">Loading Crypto records...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 3: ECONOMIC -->
+    <div id="content-economic" class="tab-content hidden space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3 p-4 rounded-xl bg-slate-900 border border-slate-800">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 rounded-lg bg-cyan-500/10 text-cyan-400 font-bold text-lg">📈</div>
+          <div>
+            <h3 class="text-sm font-bold text-white">US Macroeconomic Indicators (FRED)</h3>
+            <p class="text-xs text-slate-400">Source: Federal Reserve Bank of St. Louis &bull; 8 Key Indicators &bull; 29,171 Observations</p>
           </div>
-          <div class="p-3 rounded-lg bg-slate-900/80 border border-slate-800">
-            <p class="font-semibold text-white">Commercial Strategy</p>
-            <p class="text-slate-400 text-[11px]">Opportunity scoring & GTM plans</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="text" id="economic-search" onkeyup="filterEconomic()" placeholder="Filter indicator (e.g. GDP)..." class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500">
+          <button onclick="toggleJson('economic')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 font-medium transition border border-slate-700">
+            { } View Raw JSON
+          </button>
+        </div>
+      </div>
+
+      <!-- Raw JSON Viewer -->
+      <div id="raw-economic" class="hidden p-4 rounded-xl bg-slate-900 border border-slate-800">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-xs font-mono text-cyan-400">GET /v1/economic/sample</span>
+          <button onclick="copyJson('economic')" class="text-xs px-2.5 py-1 bg-slate-800 rounded hover:bg-slate-700 text-slate-300">Copy JSON</button>
+        </div>
+        <pre class="text-[11px] font-mono text-slate-300 max-h-64 overflow-y-auto bg-slate-950 p-3 rounded-lg border border-slate-800/80" id="json-economic-pre"></pre>
+      </div>
+
+      <!-- Economic Table -->
+      <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/60">
+        <table class="w-full text-left text-xs text-slate-300" id="economic-table">
+          <thead class="bg-slate-900 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+            <tr>
+              <th class="p-3.5">Indicator Code</th>
+              <th class="p-3.5">Indicator Title</th>
+              <th class="p-3.5">Observed Value</th>
+              <th class="p-3.5">Observation Date</th>
+              <th class="p-3.5">Country</th>
+              <th class="p-3.5">Agency</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/60" id="economic-tbody">
+            <tr><td colspan="6" class="p-6 text-center text-slate-400">Loading Economic records...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 4: DOCUMENTATION & STRATEGY -->
+    <div id="content-docs" class="tab-content hidden space-y-6">
+      
+      <!-- Opportunity Scoring Grid -->
+      <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <span>🏆 Top Ranked Commercial Opportunities</span>
+          <span class="text-xs font-normal text-slate-400">(Scored across 7 Strategic Metrics)</span>
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="p-4 rounded-xl bg-slate-800/60 border border-slate-700/60 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">Rank #1 (Score: 29)</span>
+              <span class="text-xs text-slate-400">Category D</span>
+            </div>
+            <h4 class="font-bold text-white text-sm">Forex Rates & Currency Conversion</h4>
+            <p class="text-xs text-slate-400">Universal demand across e-commerce, global payroll, fintech, and hedge funds. Zero marginal cost via ECB data.</p>
           </div>
-          <div class="p-3 rounded-lg bg-slate-900/80 border border-slate-800">
-            <p class="font-semibold text-white">Data Quality Spec</p>
-            <p class="text-slate-400 text-[11px]">Validation pipeline & monitoring</p>
+
+          <div class="p-4 rounded-xl bg-slate-800/60 border border-slate-700/60 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-500/20 text-sky-300">Rank #2 (Score: 28)</span>
+              <span class="text-xs text-slate-400">Category E</span>
+            </div>
+            <h4 class="font-bold text-white text-sm">Crypto Asset Pricing & Historical OHLCV</h4>
+            <p class="text-xs text-slate-400">High willingness to pay among crypto tax tools, portfolio trackers, and web3 analytics providers.</p>
           </div>
-          <div class="p-3 rounded-lg bg-slate-900/80 border border-slate-800">
-            <p class="font-semibold text-white">Licensing Overview</p>
-            <p class="text-slate-400 text-[11px]">Commercial redistribution rights</p>
+
+          <div class="p-4 rounded-xl bg-slate-800/60 border border-slate-700/60 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300">Rank #3 (Score: 27)</span>
+              <span class="text-xs text-slate-400">Category I</span>
+            </div>
+            <h4 class="font-bold text-white text-sm">Macroeconomic Data & Federal Reserve</h4>
+            <p class="text-xs text-slate-400">Essential for macro hedge funds, academic research, real estate valuation, and fixed-income models.</p>
           </div>
         </div>
       </div>
+
+      <!-- Pricing Plans -->
+      <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+        <h3 class="text-base font-bold text-white">Commercial API Pricing Structure</h3>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+            <p class="text-xs text-slate-400 font-semibold uppercase">Community</p>
+            <p class="text-2xl font-bold text-white">$0 <span class="text-xs text-slate-500 font-normal">/ mo</span></p>
+            <ul class="text-[11px] text-slate-400 space-y-1 pt-2">
+              <li>&bull; 1,000 req / day</li>
+              <li>&bull; 30 req / minute</li>
+              <li>&bull; Forex & Crypto Latest</li>
+            </ul>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+            <p class="text-xs text-sky-400 font-semibold uppercase">Starter</p>
+            <p class="text-2xl font-bold text-white">$49 <span class="text-xs text-slate-500 font-normal">/ mo</span></p>
+            <ul class="text-[11px] text-slate-400 space-y-1 pt-2">
+              <li>&bull; 25,000 req / day</li>
+              <li>&bull; 120 req / minute</li>
+              <li>&bull; Full historical data</li>
+            </ul>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-950 border border-sky-500/40 space-y-2 relative shadow-lg shadow-sky-500/5">
+            <span class="absolute top-2 right-2 px-1.5 py-0.5 rounded text-[9px] font-bold bg-sky-500 text-white">POPULAR</span>
+            <p class="text-xs text-emerald-400 font-semibold uppercase">Professional</p>
+            <p class="text-2xl font-bold text-white">$199 <span class="text-xs text-slate-500 font-normal">/ mo</span></p>
+            <ul class="text-[11px] text-slate-400 space-y-1 pt-2">
+              <li>&bull; 250,000 req / day</li>
+              <li>&bull; 600 req / minute</li>
+              <li>&bull; Webhooks & Sockets</li>
+            </ul>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+            <p class="text-xs text-indigo-400 font-semibold uppercase">Enterprise</p>
+            <p class="text-2xl font-bold text-white">$699+ <span class="text-xs text-slate-500 font-normal">/ mo</span></p>
+            <ul class="text-[11px] text-slate-400 space-y-1 pt-2">
+              <li>&bull; Unlimited requests</li>
+              <li>&bull; 99.95% SLA Guarantee</li>
+              <li>&bull; Custom DB feeds</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
     </div>
+
   </main>
 
   <!-- Footer -->
-  <footer class="border-t border-slate-800 text-center py-6 text-xs text-slate-500">
-    MFAPIs Platform &bull; Built with Python, SQLAlchemy, PostgreSQL, and Pandas
+  <footer class="border-t border-slate-800/80 bg-slate-900/40 text-center py-5 text-xs text-slate-500">
+    MFAPIs Financial Intelligence Engine &bull; Modular Python ETL &bull; PostgreSQL 17 Relational Storage
   </footer>
+
+  <!-- Client-side Interactive Script -->
+  <script>
+    let forexData = [];
+    let cryptoData = [];
+    let economicData = [];
+
+    async function loadData() {
+      try {
+        const [resForex, resCrypto, resEcon] = await Promise.all([
+          fetch('/v1/forex/sample').then(r => r.json()),
+          fetch('/v1/crypto/sample').then(r => r.json()),
+          fetch('/v1/economic/sample').then(r => r.json())
+        ]);
+
+        forexData = resForex.data || [];
+        cryptoData = resCrypto.data || [];
+        economicData = resEcon.data || [];
+
+        document.getElementById('json-forex-pre').innerText = JSON.stringify(resForex, null, 2);
+        document.getElementById('json-crypto-pre').innerText = JSON.stringify(resCrypto, null, 2);
+        document.getElementById('json-economic-pre').innerText = JSON.stringify(resEcon, null, 2);
+
+        renderForex(forexData);
+        renderCrypto(cryptoData);
+        renderEconomic(economicData);
+      } catch (err) {
+        console.error("Data loading error:", err);
+      }
+    }
+
+    function renderForex(items) {
+      const tbody = document.getElementById('forex-tbody');
+      if (!items.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-slate-500">No records found</td></tr>';
+        return;
+      }
+      tbody.innerHTML = items.map(item => `
+        <tr class="hover:bg-slate-800/40 transition">
+          <td class="p-3.5 font-bold text-white">
+            <span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-sky-400 mr-1.5">${item.base_currency}</span>
+            <span class="text-slate-500">&rarr;</span>
+            <span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-emerald-400 ml-1.5">${item.target_currency}</span>
+          </td>
+          <td class="p-3.5 font-mono text-emerald-400 font-semibold">${Number(item.exchange_rate).toFixed(4)}</td>
+          <td class="p-3.5 text-slate-400">${item.rate_date || 'Latest'}</td>
+          <td class="p-3.5">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-slate-300 border border-slate-700 uppercase">
+              ${item.source || 'frankfurter'}
+            </span>
+          </td>
+          <td class="p-3.5">
+            <span class="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-400">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Verified
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderCrypto(items) {
+      const tbody = document.getElementById('crypto-tbody');
+      if (!items.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">No records found</td></tr>';
+        return;
+      }
+      tbody.innerHTML = items.map(item => `
+        <tr class="hover:bg-slate-800/40 transition">
+          <td class="p-3.5 font-bold text-white capitalize flex items-center gap-2">
+            <span class="w-7 h-7 rounded-full bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center text-xs">
+              ${(item.coin_id || 'C')[0].toUpperCase()}
+            </span>
+            ${item.coin_id}
+          </td>
+          <td class="p-3.5 font-mono text-white font-bold">$${Number(item.price_usd || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
+          <td class="p-3.5 font-mono text-slate-400">$${item.market_cap_usd ? Number(item.market_cap_usd).toLocaleString() : '—'}</td>
+          <td class="p-3.5 font-mono text-slate-400">$${item.total_volume_usd ? Number(item.total_volume_usd).toLocaleString() : '—'}</td>
+          <td class="p-3.5 text-slate-400">${item.price_date}</td>
+          <td class="p-3.5">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase">
+              CoinGecko
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    const INDICATOR_NAMES = {
+      'GDP': 'Gross Domestic Product',
+      'CPIAUCSL': 'Consumer Price Index (CPI)',
+      'UNRATE': 'Unemployment Rate',
+      'FEDFUNDS': 'Federal Funds Effective Rate',
+      'DGS10': '10-Year Treasury Yield',
+      'DEXUSEU': 'US Dollar / Euro Rate',
+      'INDPRO': 'Industrial Production Index',
+      'TOTALSA': 'Total Vehicle Sales'
+    };
+
+    function renderEconomic(items) {
+      const tbody = document.getElementById('economic-tbody');
+      if (!items.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">No records found</td></tr>';
+        return;
+      }
+      tbody.innerHTML = items.map(item => `
+        <tr class="hover:bg-slate-800/40 transition">
+          <td class="p-3.5 font-mono font-bold text-cyan-400">${item.indicator_id}</td>
+          <td class="p-3.5 font-medium text-white">${INDICATOR_NAMES[item.indicator_id] || item.indicator_id}</td>
+          <td class="p-3.5 font-mono font-bold text-white">${(item.value !== null && !isNaN(item.value)) ? Number(item.value).toLocaleString() : '—'}</td>
+          <td class="p-3.5 text-slate-400">${item.observation_date}</td>
+          <td class="p-3.5">
+            <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-semibold text-[10px] border border-slate-700">
+              ${item.country || 'US'}
+            </span>
+          </td>
+          <td class="p-3.5">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 uppercase">
+              St. Louis Fed (FRED)
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function filterForex() {
+      const q = document.getElementById('forex-search').value.toLowerCase();
+      const filtered = forexData.filter(d => 
+        (d.base_currency && d.base_currency.toLowerCase().includes(q)) ||
+        (d.target_currency && d.target_currency.toLowerCase().includes(q))
+      );
+      renderForex(filtered);
+    }
+
+    function filterCrypto() {
+      const q = document.getElementById('crypto-search').value.toLowerCase();
+      const filtered = cryptoData.filter(d => 
+        (d.coin_id && d.coin_id.toLowerCase().includes(q))
+      );
+      renderCrypto(filtered);
+    }
+
+    function filterEconomic() {
+      const q = document.getElementById('economic-search').value.toLowerCase();
+      const filtered = economicData.filter(d => 
+        (d.indicator_id && d.indicator_id.toLowerCase().includes(q))
+      );
+      renderEconomic(filtered);
+    }
+
+    function switchTab(name) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'text-sky-400', 'bg-slate-800'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+
+      const activeBtn = document.getElementById('tab-' + name);
+      activeBtn.classList.add('active');
+
+      document.getElementById('content-' + name).classList.remove('hidden');
+    }
+
+    function toggleJson(type) {
+      const el = document.getElementById('raw-' + type);
+      el.classList.toggle('hidden');
+    }
+
+    function copyJson(type) {
+      const text = document.getElementById('json-' + type + '-pre').innerText;
+      navigator.clipboard.writeText(text);
+      alert('JSON copied to clipboard!');
+    }
+
+    window.onload = loadData;
+  </script>
 </body>
 </html>
 """
