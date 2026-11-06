@@ -1,11 +1,35 @@
 import os
 import json
+import re
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 
-HTML_DASHBOARD = """<!DOCTYPE html>
+def load_clean_json(filename: str) -> dict:
+    filepath = BASE_DIR / "output" / filename
+    if not filepath.exists():
+        return {"data": []}
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            content = f.read()
+            content = re.sub(r':\s*NaN', ': null', content)
+            return json.loads(content)
+    except Exception as e:
+        print(f"Error loading {filename}: {e}")
+        return {"data": []}
+
+
+def generate_html_dashboard() -> str:
+    forex_data = load_clean_json("forex_sample.json")
+    crypto_data = load_clean_json("crypto_sample.json")
+    economic_data = load_clean_json("economic_sample.json")
+
+    forex_json_str = json.dumps(forex_data, default=str)
+    crypto_json_str = json.dumps(crypto_data, default=str)
+    economic_json_str = json.dumps(economic_data, default=str)
+
+    return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -16,12 +40,12 @@ HTML_DASHBOARD = """<!DOCTYPE html>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    .tab-btn.active {
+    body {{ font-family: 'Plus Jakarta Sans', sans-serif; }}
+    .tab-btn.active {{
       background-color: rgb(30 41 59);
       color: #38bdf8;
       border-color: #0284c7;
-    }
+    }}
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-sky-500 selection:text-white">
@@ -44,7 +68,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
         </div>
       </div>
       
-      <!-- Top Metrics Badges -->
+      <!-- Top Badges -->
       <div class="flex items-center gap-2 sm:gap-3 text-xs">
         <div class="px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700/60 hidden sm:block">
           <span class="text-slate-400">PostgreSQL Records:</span>
@@ -54,7 +78,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
           <span class="text-slate-400">Tests:</span>
           <span class="font-bold text-emerald-400 ml-1">48/48 Passing</span>
         </div>
-        <a href="/health" class="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-medium transition shadow-sm">
+        <a href="/health" target="_blank" class="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-medium transition shadow-sm">
           System Health
         </a>
       </div>
@@ -109,7 +133,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
         <div class="flex items-center gap-2">
           <input type="text" id="forex-search" onkeyup="filterForex()" placeholder="Filter currency..." class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500">
           <button onclick="toggleJson('forex')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 font-medium transition border border-slate-700">
-            { } View Raw JSON
+            {{ }} View Raw JSON
           </button>
         </div>
       </div>
@@ -124,7 +148,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       </div>
 
       <!-- Forex Table -->
-      <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/60">
+      <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/60 shadow-lg">
         <table class="w-full text-left text-xs text-slate-300" id="forex-table">
           <thead class="bg-slate-900 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
             <tr>
@@ -135,9 +159,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
               <th class="p-3.5">Status</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-800/60" id="forex-tbody">
-            <tr><td colspan="5" class="p-6 text-center text-slate-400">Loading Forex records...</td></tr>
-          </tbody>
+          <tbody class="divide-y divide-slate-800/60" id="forex-tbody"></tbody>
         </table>
       </div>
     </div>
@@ -155,7 +177,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
         <div class="flex items-center gap-2">
           <input type="text" id="crypto-search" onkeyup="filterCrypto()" placeholder="Filter asset (e.g. BTC)..." class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500">
           <button onclick="toggleJson('crypto')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 font-medium transition border border-slate-700">
-            { } View Raw JSON
+            {{ }} View Raw JSON
           </button>
         </div>
       </div>
@@ -170,7 +192,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       </div>
 
       <!-- Crypto Table -->
-      <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/60">
+      <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/60 shadow-lg">
         <table class="w-full text-left text-xs text-slate-300" id="crypto-table">
           <thead class="bg-slate-900 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
             <tr>
@@ -182,9 +204,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
               <th class="p-3.5">Provider</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-800/60" id="crypto-tbody">
-            <tr><td colspan="6" class="p-6 text-center text-slate-400">Loading Crypto records...</td></tr>
-          </tbody>
+          <tbody class="divide-y divide-slate-800/60" id="crypto-tbody"></tbody>
         </table>
       </div>
     </div>
@@ -202,7 +222,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
         <div class="flex items-center gap-2">
           <input type="text" id="economic-search" onkeyup="filterEconomic()" placeholder="Filter indicator (e.g. GDP)..." class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500">
           <button onclick="toggleJson('economic')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 font-medium transition border border-slate-700">
-            { } View Raw JSON
+            {{ }} View Raw JSON
           </button>
         </div>
       </div>
@@ -217,7 +237,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       </div>
 
       <!-- Economic Table -->
-      <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/60">
+      <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/60 shadow-lg">
         <table class="w-full text-left text-xs text-slate-300" id="economic-table">
           <thead class="bg-slate-900 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
             <tr>
@@ -229,9 +249,7 @@ HTML_DASHBOARD = """<!DOCTYPE html>
               <th class="p-3.5">Agency</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-800/60" id="economic-tbody">
-            <tr><td colspan="6" class="p-6 text-center text-slate-400">Loading Economic records...</td></tr>
-          </tbody>
+          <tbody class="divide-y divide-slate-800/60" id="economic-tbody"></tbody>
         </table>
       </div>
     </div>
@@ -329,54 +347,44 @@ HTML_DASHBOARD = """<!DOCTYPE html>
     MFAPIs Financial Intelligence Engine &bull; Modular Python ETL &bull; PostgreSQL 17 Relational Storage
   </footer>
 
-  <!-- Client-side Interactive Script -->
+  <!-- Instant Data Injection -->
   <script>
-    let forexData = [];
-    let cryptoData = [];
-    let economicData = [];
+    const INITIAL_FOREX = {forex_json_str};
+    const INITIAL_CRYPTO = {crypto_json_str};
+    const INITIAL_ECONOMIC = {economic_json_str};
 
-    async function loadData() {
-      try {
-        const [resForex, resCrypto, resEcon] = await Promise.all([
-          fetch('/v1/forex/sample').then(r => r.json()),
-          fetch('/v1/crypto/sample').then(r => r.json()),
-          fetch('/v1/economic/sample').then(r => r.json())
-        ]);
+    let forexData = INITIAL_FOREX.data || [];
+    let cryptoData = INITIAL_CRYPTO.data || [];
+    let economicData = INITIAL_ECONOMIC.data || [];
 
-        forexData = resForex.data || [];
-        cryptoData = resCrypto.data || [];
-        economicData = resEcon.data || [];
+    function initPage() {{
+      document.getElementById('json-forex-pre').innerText = JSON.stringify(INITIAL_FOREX, null, 2);
+      document.getElementById('json-crypto-pre').innerText = JSON.stringify(INITIAL_CRYPTO, null, 2);
+      document.getElementById('json-economic-pre').innerText = JSON.stringify(INITIAL_ECONOMIC, null, 2);
 
-        document.getElementById('json-forex-pre').innerText = JSON.stringify(resForex, null, 2);
-        document.getElementById('json-crypto-pre').innerText = JSON.stringify(resCrypto, null, 2);
-        document.getElementById('json-economic-pre').innerText = JSON.stringify(resEcon, null, 2);
+      renderForex(forexData);
+      renderCrypto(cryptoData);
+      renderEconomic(economicData);
+    }}
 
-        renderForex(forexData);
-        renderCrypto(cryptoData);
-        renderEconomic(economicData);
-      } catch (err) {
-        console.error("Data loading error:", err);
-      }
-    }
-
-    function renderForex(items) {
+    function renderForex(items) {{
       const tbody = document.getElementById('forex-tbody');
-      if (!items.length) {
+      if (!items || !items.length) {{
         tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-slate-500">No records found</td></tr>';
         return;
-      }
+      }}
       tbody.innerHTML = items.map(item => `
         <tr class="hover:bg-slate-800/40 transition">
           <td class="p-3.5 font-bold text-white">
-            <span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-sky-400 mr-1.5">${item.base_currency}</span>
+            <span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-sky-400 mr-1.5">${{item.base_currency}}</span>
             <span class="text-slate-500">&rarr;</span>
-            <span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-emerald-400 ml-1.5">${item.target_currency}</span>
+            <span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-emerald-400 ml-1.5">${{item.target_currency}}</span>
           </td>
-          <td class="p-3.5 font-mono text-emerald-400 font-semibold">${Number(item.exchange_rate).toFixed(4)}</td>
-          <td class="p-3.5 text-slate-400">${item.rate_date || 'Latest'}</td>
+          <td class="p-3.5 font-mono text-emerald-400 font-semibold">${{Number(item.exchange_rate).toFixed(4)}}</td>
+          <td class="p-3.5 text-slate-400">${{item.rate_date || 'Latest'}}</td>
           <td class="p-3.5">
             <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-slate-300 border border-slate-700 uppercase">
-              ${item.source || 'frankfurter'}
+              ${{item.source || 'frankfurter'}}
             </span>
           </td>
           <td class="p-3.5">
@@ -386,26 +394,26 @@ HTML_DASHBOARD = """<!DOCTYPE html>
           </td>
         </tr>
       `).join('');
-    }
+    }}
 
-    function renderCrypto(items) {
+    function renderCrypto(items) {{
       const tbody = document.getElementById('crypto-tbody');
-      if (!items.length) {
+      if (!items || !items.length) {{
         tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">No records found</td></tr>';
         return;
-      }
+      }}
       tbody.innerHTML = items.map(item => `
         <tr class="hover:bg-slate-800/40 transition">
           <td class="p-3.5 font-bold text-white capitalize flex items-center gap-2">
             <span class="w-7 h-7 rounded-full bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center text-xs">
-              ${(item.coin_id || 'C')[0].toUpperCase()}
+              ${{(item.coin_id || 'C')[0].toUpperCase()}}
             </span>
-            ${item.coin_id}
+            ${{item.coin_id}}
           </td>
-          <td class="p-3.5 font-mono text-white font-bold">$${Number(item.price_usd || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 4})}</td>
-          <td class="p-3.5 font-mono text-slate-400">$${item.market_cap_usd ? Number(item.market_cap_usd).toLocaleString() : '—'}</td>
-          <td class="p-3.5 font-mono text-slate-400">$${item.total_volume_usd ? Number(item.total_volume_usd).toLocaleString() : '—'}</td>
-          <td class="p-3.5 text-slate-400">${item.price_date}</td>
+          <td class="p-3.5 font-mono text-white font-bold">$${{Number(item.price_usd || 0).toLocaleString(undefined, {{minimumFractionDigits: 2, maximumFractionDigits: 4}})}}</td>
+          <td class="p-3.5 font-mono text-slate-400">$${{item.market_cap_usd ? Number(item.market_cap_usd).toLocaleString() : '—'}}</td>
+          <td class="p-3.5 font-mono text-slate-400">$${{item.total_volume_usd ? Number(item.total_volume_usd).toLocaleString() : '—'}}</td>
+          <td class="p-3.5 text-slate-400">${{item.price_date}}</td>
           <td class="p-3.5">
             <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase">
               CoinGecko
@@ -413,9 +421,9 @@ HTML_DASHBOARD = """<!DOCTYPE html>
           </td>
         </tr>
       `).join('');
-    }
+    }}
 
-    const INDICATOR_NAMES = {
+    const INDICATOR_NAMES = {{
       'GDP': 'Gross Domestic Product',
       'CPIAUCSL': 'Consumer Price Index (CPI)',
       'UNRATE': 'Unemployment Rate',
@@ -424,23 +432,23 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       'DEXUSEU': 'US Dollar / Euro Rate',
       'INDPRO': 'Industrial Production Index',
       'TOTALSA': 'Total Vehicle Sales'
-    };
+    }};
 
-    function renderEconomic(items) {
+    function renderEconomic(items) {{
       const tbody = document.getElementById('economic-tbody');
-      if (!items.length) {
+      if (!items || !items.length) {{
         tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">No records found</td></tr>';
         return;
-      }
+      }}
       tbody.innerHTML = items.map(item => `
         <tr class="hover:bg-slate-800/40 transition">
-          <td class="p-3.5 font-mono font-bold text-cyan-400">${item.indicator_id}</td>
-          <td class="p-3.5 font-medium text-white">${INDICATOR_NAMES[item.indicator_id] || item.indicator_id}</td>
-          <td class="p-3.5 font-mono font-bold text-white">${(item.value !== null && !isNaN(item.value)) ? Number(item.value).toLocaleString() : '—'}</td>
-          <td class="p-3.5 text-slate-400">${item.observation_date}</td>
+          <td class="p-3.5 font-mono font-bold text-cyan-400">${{item.indicator_id}}</td>
+          <td class="p-3.5 font-medium text-white">${{INDICATOR_NAMES[item.indicator_id] || item.indicator_id}}</td>
+          <td class="p-3.5 font-mono font-bold text-white">${{(item.value !== null && !isNaN(item.value)) ? Number(item.value).toLocaleString() : '—'}}</td>
+          <td class="p-3.5 text-slate-400">${{item.observation_date}}</td>
           <td class="p-3.5">
             <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-semibold text-[10px] border border-slate-700">
-              ${item.country || 'US'}
+              ${{item.country || 'US'}}
             </span>
           </td>
           <td class="p-3.5">
@@ -450,34 +458,34 @@ HTML_DASHBOARD = """<!DOCTYPE html>
           </td>
         </tr>
       `).join('');
-    }
+    }}
 
-    function filterForex() {
+    function filterForex() {{
       const q = document.getElementById('forex-search').value.toLowerCase();
       const filtered = forexData.filter(d => 
         (d.base_currency && d.base_currency.toLowerCase().includes(q)) ||
         (d.target_currency && d.target_currency.toLowerCase().includes(q))
       );
       renderForex(filtered);
-    }
+    }}
 
-    function filterCrypto() {
+    function filterCrypto() {{
       const q = document.getElementById('crypto-search').value.toLowerCase();
       const filtered = cryptoData.filter(d => 
         (d.coin_id && d.coin_id.toLowerCase().includes(q))
       );
       renderCrypto(filtered);
-    }
+    }}
 
-    function filterEconomic() {
+    function filterEconomic() {{
       const q = document.getElementById('economic-search').value.toLowerCase();
       const filtered = economicData.filter(d => 
         (d.indicator_id && d.indicator_id.toLowerCase().includes(q))
       );
       renderEconomic(filtered);
-    }
+    }}
 
-    function switchTab(name) {
+    function switchTab(name) {{
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'text-sky-400', 'bg-slate-800'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
 
@@ -485,20 +493,20 @@ HTML_DASHBOARD = """<!DOCTYPE html>
       activeBtn.classList.add('active');
 
       document.getElementById('content-' + name).classList.remove('hidden');
-    }
+    }}
 
-    function toggleJson(type) {
+    function toggleJson(type) {{
       const el = document.getElementById('raw-' + type);
       el.classList.toggle('hidden');
-    }
+    }}
 
-    function copyJson(type) {
+    function copyJson(type) {{
       const text = document.getElementById('json-' + type + '-pre').innerText;
       navigator.clipboard.writeText(text);
       alert('JSON copied to clipboard!');
-    }
+    }}
 
-    window.onload = loadData;
+    window.onload = initPage;
   </script>
 </body>
 </html>
@@ -524,7 +532,7 @@ class MFAPIsHandler(BaseHTTPRequestHandler):
         path = self.path.split("?")[0].rstrip("/")
 
         if path in ("", "/"):
-            self._send_html(HTML_DASHBOARD)
+            self._send_html(generate_html_dashboard())
             return
 
         if path == "/health":
@@ -544,28 +552,25 @@ class MFAPIsHandler(BaseHTTPRequestHandler):
             return
 
         if path == "/v1/forex/sample":
-            filepath = BASE_DIR / "output" / "forex_sample.json"
-            if filepath.exists():
-                with open(filepath, "r", encoding="utf-8") as f:
-                    self._send_json(200, json.load(f))
+            data = load_clean_json("forex_sample.json")
+            if data and data.get("data"):
+                self._send_json(200, data)
             else:
                 self._send_json(404, {"error": "Forex sample not found"})
             return
 
         if path == "/v1/crypto/sample":
-            filepath = BASE_DIR / "output" / "crypto_sample.json"
-            if filepath.exists():
-                with open(filepath, "r", encoding="utf-8") as f:
-                    self._send_json(200, json.load(f))
+            data = load_clean_json("crypto_sample.json")
+            if data and data.get("data"):
+                self._send_json(200, data)
             else:
                 self._send_json(404, {"error": "Crypto sample not found"})
             return
 
         if path == "/v1/economic/sample":
-            filepath = BASE_DIR / "output" / "economic_sample.json"
-            if filepath.exists():
-                with open(filepath, "r", encoding="utf-8") as f:
-                    self._send_json(200, json.load(f))
+            data = load_clean_json("economic_sample.json")
+            if data and data.get("data"):
+                self._send_json(200, data)
             else:
                 self._send_json(404, {"error": "Economic sample not found"})
             return

@@ -21,10 +21,11 @@ def export_sample_json(
     filepath = output_dir / filename
 
     if len(data) > sample_size:
-        sample_df = data.head(sample_size)
+        sample_df = data.head(sample_size).copy()
     else:
-        sample_df = data
+        sample_df = data.copy()
 
+    sample_df = sample_df.where(pd.notnull(sample_df), None)
     records = sample_df.to_dict(orient="records")
 
     output = {
