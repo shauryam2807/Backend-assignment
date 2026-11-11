@@ -70,3 +70,40 @@ class ForexDailyRate(Base):
             "rate": float(self.exchange_rate),
             "source": self.source
         }
+
+
+class ForexOHLCV(Base):
+    __tablename__ = "forex_ohlcv_daily"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    pair_name = Column(String(10), nullable=False)
+    base_currency = Column(String(3), nullable=False)
+    target_currency = Column(String(3), nullable=False)
+    candle_date = Column(Date, nullable=False)
+    open_price = Column(Numeric(18, 8), nullable=False)
+    high_price = Column(Numeric(18, 8), nullable=False)
+    low_price = Column(Numeric(18, 8), nullable=False)
+    close_price = Column(Numeric(18, 8), nullable=False)
+    volume = Column(Numeric(24, 2), default=0)
+    source = Column(String(50), default="yahoo_finance")
+    raw_response_id = Column(String(100))
+    created_at = Column(DateTime, default=_utcnow)
+    updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow)
+
+    __table_args__ = (
+        UniqueConstraint("pair_name", "candle_date", name="uq_forex_ohlcv"),
+        Index("idx_forex_ohlcv_date", "candle_date"),
+        Index("idx_forex_ohlcv_pair", "pair_name"),
+    )
+
+    def to_dict(self):
+        return {
+            "symbol": self.pair_name,
+            "datetime": self.candle_date.isoformat(),
+            "open": f"{float(self.open_price):.5f}",
+            "high": f"{float(self.high_price):.5f}",
+            "low": f"{float(self.low_price):.5f}",
+            "close": f"{float(self.close_price):.5f}",
+            "volume": f"{int(self.volume or 0)}",
+            "source": self.source,
+        }

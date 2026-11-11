@@ -108,3 +108,44 @@ CREATE TABLE IF NOT EXISTS pipeline_runs (
     completed_at    TIMESTAMP,
     duration_seconds DECIMAL(10, 2)
 );
+
+CREATE TABLE IF NOT EXISTS crypto_ohlcv_daily (
+    id              SERIAL PRIMARY KEY,
+    symbol          VARCHAR(20) NOT NULL,
+    candle_date     DATE NOT NULL,
+    open_price      DECIMAL(24, 8) NOT NULL,
+    high_price      DECIMAL(24, 8) NOT NULL,
+    low_price       DECIMAL(24, 8) NOT NULL,
+    close_price     DECIMAL(24, 8) NOT NULL,
+    volume          DECIMAL(24, 8) DEFAULT 0,
+    quote_volume    DECIMAL(24, 2) DEFAULT 0,
+    source          VARCHAR(50) DEFAULT 'binance',
+    raw_response_id VARCHAR(100),
+    created_at      TIMESTAMP DEFAULT NOW(),
+    updated_at      TIMESTAMP DEFAULT NOW(),
+    UNIQUE(symbol, candle_date)
+);
+
+CREATE INDEX IF NOT EXISTS idx_crypto_ohlcv_date ON crypto_ohlcv_daily(candle_date);
+CREATE INDEX IF NOT EXISTS idx_crypto_ohlcv_symbol ON crypto_ohlcv_daily(symbol);
+
+CREATE TABLE IF NOT EXISTS forex_ohlcv_daily (
+    id              SERIAL PRIMARY KEY,
+    pair_name       VARCHAR(10) NOT NULL,
+    base_currency   VARCHAR(3) NOT NULL,
+    target_currency VARCHAR(3) NOT NULL,
+    candle_date     DATE NOT NULL,
+    open_price      DECIMAL(18, 8) NOT NULL,
+    high_price      DECIMAL(18, 8) NOT NULL,
+    low_price       DECIMAL(18, 8) NOT NULL,
+    close_price     DECIMAL(18, 8) NOT NULL,
+    volume          DECIMAL(24, 2) DEFAULT 0,
+    source          VARCHAR(50) DEFAULT 'yahoo_finance',
+    raw_response_id VARCHAR(100),
+    created_at      TIMESTAMP DEFAULT NOW(),
+    updated_at      TIMESTAMP DEFAULT NOW(),
+    UNIQUE(pair_name, candle_date)
+);
+
+CREATE INDEX IF NOT EXISTS idx_forex_ohlcv_date ON forex_ohlcv_daily(candle_date);
+CREATE INDEX IF NOT EXISTS idx_forex_ohlcv_pair ON forex_ohlcv_daily(pair_name);

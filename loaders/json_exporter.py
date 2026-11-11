@@ -20,10 +20,17 @@ def export_sample_json(
     output_dir.mkdir(parents=True, exist_ok=True)
     filepath = output_dir / filename
 
-    if len(data) > sample_size:
-        sample_df = data.head(sample_size).copy()
+    # Sort descending by date if date column exists so latest records are preserved
+    date_cols = [c for c in data.columns if any(k in c.lower() for k in ["date", "time"])]
+    if date_cols:
+        sorted_data = data.sort_values(by=date_cols[0], ascending=False)
     else:
-        sample_df = data.copy()
+        sorted_data = data
+
+    if len(sorted_data) > sample_size:
+        sample_df = sorted_data.head(sample_size).copy()
+    else:
+        sample_df = sorted_data.copy()
 
     sample_df = sample_df.where(pd.notnull(sample_df), None)
     records = sample_df.to_dict(orient="records")

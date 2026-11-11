@@ -6,8 +6,8 @@ from sqlalchemy import text
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 
 from models.base import engine, get_session
-from models.forex import ForexPair, ForexDailyRate
-from models.crypto import Cryptocurrency, CryptoDailyPrice
+from models.forex import ForexPair, ForexDailyRate, ForexOHLCV
+from models.crypto import Cryptocurrency, CryptoDailyPrice, CryptoOHLCV
 from models.economic import EconomicIndicator, EconomicIndicatorValue
 from models.pipeline import PipelineRun
 from config.logging_config import get_logger
@@ -254,6 +254,94 @@ class DatabaseLoader:
                     loaded += 1
 
         self.logger.info("Economic values loaded", count=loaded)
+        return loaded
+
+    def load_crypto_ohlcv(self, df: pd.DataFrame) -> int:
+        if df.empty:
+            return 0
+
+        records = df.to_dict(orient="records")
+        loaded = 0
+
+        with get_session() as session:
+            for i in range(0, len(records), 500):
+                batch = records[i:i + 500]
+                for record in batch:
+                    stmt = pg_insert(CryptoOHLCV).values(
+                        symbol=record["symbol"],
+                        candle_date=record["candle_date"],
+                        open_price=record["open_price"],
+                        high_price=record["high_price"],
+                        low_price=record["low_price"],
+                        close_price=record["close_price"],
+                        volume=record.get("volume", 0),
+                        quote_volume=record.get("quote_volume", 0),
+                        source=record.get("source", "binance"),
+                        raw_response_id=record.get("raw_response_id"),
+                        updated_at=_utcnow()
+                    )
+
+                    stmt = stmt.on_conflict_do_update(
+                        constraint="uq_crypto_ohlcv",
+                        set_={
+                            "open_price": stmt.excluded.open_price,
+                            "high_price": stmt.excluded.high_price,
+                            "low_price": stmt.excluded.low_price,
+                            "close_price": stmt.excluded.close_price,
+                            "volume": stmt.excluded.volume,
+                            "quote_volume": stmt.excluded.quote_volume,
+                            "updated_at": _utcnow()
+                        }
+                    )
+
+                    session.execute(stmt)
+                    loaded += 1
+
+        self.logger.info("Crypto OHLCV loaded", count=loaded)
+        return loaded
+
+    def load_forex_ohlcv(self, df: pd.DataFrame) -> int:
+        if df.empty:
+            return 0
+
+        records = df.to_dict(orient="records")
+        loaded = 0
+
+        with get_session() as session:
+            for i in range(0, len(records), 500):
+                batch = records[i:i + 500]
+                for record in batch:
+                    stmt = pg_insert(ForexOHLCV).values(
+                        pair_name=record["pair_name"],
+                        base_currency=record["base_currency"],
+                        target_currency=record["target_currency"],
+                        candle_date=record["candle_date"],
+                        open_price=record["open_price"],
+                        high_price=record["high_price"],
+                        low_price=record["low_price"],
+                        close_price=record["close_price"],
+                        volume=record.get("volume", 0),
+                        source=record.get("source", "yahoo_finance"),
+                        raw_response_id=record.get("raw_response_id"),
+                        updated_at=_utcnow()
+                    )
+
+                    stmt = stmt.on_conflict_do_update(
+                        constraint="uq_forex_ohlcv",
+                        set_={
+                            "open_price": stmt.excluded.open_price,
+                            "high_price": stmt.excluded.high_price,
+                            "low_price": stmt.excluded.low_price,
+                            "close_price": stmt.excluded.close_price,
+                            "volume": stmt.excluded.volume,
+                            "updated_at": _utcnow()
+                        }
+                    )
+
+                    session.execute(stmt)
+                    loaded += 1
+
+        self.logger.info("Forex OHLCV loaded", count=loaded)
         return loaded
 
     def log_pipeline_run(

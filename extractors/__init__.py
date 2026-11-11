@@ -2,3 +2,5 @@ from extractors.base_extractor import BaseExtractor
 from extractors.forex_extractor import ForexExtractor
 from extractors.crypto_extractor import CryptoExtractor
 from extractors.economic_extractor import EconomicExtractor
+from extractors.binance_extractor import BinanceExtractor
+from extractors.forex_ohlc_extractor import ForexOHLCExtractor

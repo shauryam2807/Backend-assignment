@@ -18,6 +18,20 @@ class Settings:
     COINGECKO_BASE_URL: str = "https://api.coingecko.com/api/v3"
     FRED_BASE_URL: str = "https://api.stlouisfed.org/fred"
 
+    # Twelve Data compatible sources (no API key required)
+    BINANCE_BASE_URL: str = "https://api.binance.com/api/v3"
+    BINANCE_SYMBOLS: list = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT"]
+    YAHOO_FINANCE_CHART_URL: str = "https://query1.finance.yahoo.com/v8/finance/chart"
+    FOREX_OHLC_PAIRS: dict = {
+        "EUR/USD": "EURUSD=X",
+        "GBP/USD": "GBPUSD=X",
+        "USD/JPY": "USDJPY=X",
+        "USD/INR": "USDINR=X",
+        "USD/CAD": "USDCAD=X",
+        "AUD/USD": "AUDUSD=X",
+        "USD/CHF": "USDCHF=X"
+    }
+
     RAW_RESPONSES_DIR: Path = BASE_DIR / "raw_responses"
     OUTPUT_DIR: Path = BASE_DIR / "output"
 

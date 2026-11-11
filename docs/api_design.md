@@ -348,20 +348,175 @@ Get time series data for an indicator.
 
 ---
 
+## Twelve Data Compatible Endpoints
+
+These endpoints match the Twelve Data API contract exactly, serving real OHLCV data from Binance (crypto) and Yahoo Finance (forex).
+
+### `GET /time_series`
+
+Returns OHLCV candle data in Twelve Data standard format.
+
+**Query Parameters:**
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `symbol` | string | required | Symbol (e.g., `BTC/USD`, `EUR/USD`) |
+| `interval` | string | `1day` | Candle interval |
+| `outputsize` | int | `30` | Number of candles (max 5000) |
+
+**Response:**
+```json
+{
+  "meta": {
+    "symbol": "BTC/USD",
+    "interval": "1day",
+    "currency_base": "BTC",
+    "currency_quote": "USD",
+    "exchange": "Binance",
+    "type": "Digital Currency"
+  },
+  "values": [
+    {
+      "datetime": "2026-11-09",
+      "open": "76450.00",
+      "high": "77200.00",
+      "low": "75800.00",
+      "close": "76900.00",
+      "volume": "12345"
+    }
+  ],
+  "status": "ok"
+}
+```
+
+### `GET /quote`
+
+Returns a real-time quote snapshot with change calculation and 52-week range.
+
+**Query Parameters:**
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `symbol` | string | required | Symbol (e.g., `BTC/USD`, `EUR/USD`) |
+
+**Response:**
+```json
+{
+  "symbol": "BTC/USD",
+  "name": "BTC / USD",
+  "exchange": "Binance",
+  "datetime": "2026-11-09",
+  "open": "76450.00",
+  "high": "77200.00",
+  "low": "75800.00",
+  "close": "76900.00",
+  "volume": "12345",
+  "previous_close": "76200.00",
+  "change": "+700.00",
+  "percent_change": "+0.9186",
+  "fifty_two_week": {
+    "low": "52100.00",
+    "high": "99800.00"
+  }
+}
+```
+
+### `GET /price`
+
+Returns the latest close price for a symbol.
+
+**Query Parameters:**
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `symbol` | string | required | Symbol (e.g., `BTC/USD`) |
+
+**Response:**
+```json
+{"price": "76900.00"}
+```
+
+### `GET /exchange_rate`
+
+Returns the latest exchange rate between two currencies.
+
+**Query Parameters:**
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `symbol` | string | required | Pair (e.g., `EUR/USD`) |
+
+**Response:**
+```json
+{
+  "symbol": "EUR/USD",
+  "rate": 1.08912,
+  "timestamp": 1731100800
+}
+```
+
+### `GET /eod`
+
+Returns end-of-day OHLCV data for a symbol.
+
+**Query Parameters:**
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `symbol` | string | required | Symbol (e.g., `BTC/USD`) |
+
+**Response:**
+```json
+{
+  "symbol": "BTC/USD",
+  "exchange": "Binance",
+  "datetime": "2026-11-09",
+  "close": "76900.00",
+  "open": "76450.00",
+  "high": "77200.00",
+  "low": "75800.00",
+  "volume": "12345"
+}
+```
+
+### `GET /cryptocurrencies`
+
+Returns list of available cryptocurrency symbols.
+
+### `GET /forex_pairs`
+
+Returns list of available forex currency pairs.
+
+---
+
+## Data Sources
+
+| Asset Class | Source | API Key Required |
+|-------------|--------|-----------------|
+| Crypto OHLCV | Binance Public API | No |
+| Forex OHLC | Yahoo Finance Chart API | No |
+| Forex Rates | Frankfurter (ECB) | No |
+| Crypto Market | CoinGecko | No |
+| Economic | FRED (St. Louis Fed) | Yes (free) |
+
+---
+
 ## SDK Example (Python)
 
 ```python
 import requests
 
-API_KEY = "your_api_key"
-BASE_URL = "https://api.mfapis.com/v1"
+# Twelve Data compatible endpoint (no auth required for demo)
+BASE_URL = "http://localhost:10000"
 
+# Get BTC/USD time series
 response = requests.get(
-    f"{BASE_URL}/forex/rates/latest",
-    headers={"X-API-Key": API_KEY},
-    params={"base": "USD", "targets": "EUR,GBP,INR"}
+    f"{BASE_URL}/time_series",
+    params={"symbol": "BTC/USD", "interval": "1day", "outputsize": 10}
 )
-
 data = response.json()
-print(f"USD to INR: {data['data']['INR']}")
+print(f"Latest BTC close: {data['values'][0]['close']}")
+
+# Get EUR/USD exchange rate
+response = requests.get(
+    f"{BASE_URL}/exchange_rate",
+    params={"symbol": "EUR/USD"}
+)
+rate = response.json()
+print(f"EUR/USD rate: {rate['rate']}")
 ```

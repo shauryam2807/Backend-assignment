@@ -70,3 +70,39 @@ class CryptoDailyPrice(Base):
             "total_volume_usd": float(self.total_volume_usd) if self.total_volume_usd else None,
             "price_change_24h": float(self.price_change_24h) if self.price_change_24h else None,
         }
+
+
+class CryptoOHLCV(Base):
+    __tablename__ = "crypto_ohlcv_daily"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    symbol = Column(String(20), nullable=False)
+    candle_date = Column(Date, nullable=False)
+    open_price = Column(Numeric(24, 8), nullable=False)
+    high_price = Column(Numeric(24, 8), nullable=False)
+    low_price = Column(Numeric(24, 8), nullable=False)
+    close_price = Column(Numeric(24, 8), nullable=False)
+    volume = Column(Numeric(24, 8), default=0)
+    quote_volume = Column(Numeric(24, 2), default=0)
+    source = Column(String(50), default="binance")
+    raw_response_id = Column(String(100))
+    created_at = Column(DateTime, default=_utcnow)
+    updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow)
+
+    __table_args__ = (
+        UniqueConstraint("symbol", "candle_date", name="uq_crypto_ohlcv"),
+        Index("idx_crypto_ohlcv_date", "candle_date"),
+        Index("idx_crypto_ohlcv_symbol", "symbol"),
+    )
+
+    def to_dict(self):
+        return {
+            "symbol": self.symbol,
+            "datetime": self.candle_date.isoformat(),
+            "open": f"{float(self.open_price):.2f}",
+            "high": f"{float(self.high_price):.2f}",
+            "low": f"{float(self.low_price):.2f}",
+            "close": f"{float(self.close_price):.2f}",
+            "volume": f"{int(self.volume or 0)}",
+            "source": self.source,
+        }

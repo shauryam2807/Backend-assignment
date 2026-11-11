@@ -6,6 +6,8 @@ from models.base import init_database
 from pipelines.forex_pipeline import run_forex_pipeline
 from pipelines.crypto_pipeline import run_crypto_pipeline
 from pipelines.economic_pipeline import run_economic_pipeline
+from pipelines.crypto_ohlcv_pipeline import run_crypto_ohlcv_pipeline
+from pipelines.forex_ohlc_pipeline import run_forex_ohlc_pipeline
 
 logger = get_logger("RunAllPipelines")
 
@@ -38,6 +40,18 @@ def run_all():
     except Exception as e:
         results["economic"] = {"status": "failed", "error": str(e)}
         logger.error(f"Economic pipeline failed: {e}")
+
+    try:
+        results["crypto_ohlcv"] = run_crypto_ohlcv_pipeline()
+    except Exception as e:
+        results["crypto_ohlcv"] = {"status": "failed", "error": str(e)}
+        logger.error(f"Crypto OHLCV pipeline failed: {e}")
+
+    try:
+        results["forex_ohlcv"] = run_forex_ohlc_pipeline()
+    except Exception as e:
+        results["forex_ohlcv"] = {"status": "failed", "error": str(e)}
+        logger.error(f"Forex OHLCV pipeline failed: {e}")
 
     duration = round(time.time() - start, 2)
     logger.info("=" * 60)

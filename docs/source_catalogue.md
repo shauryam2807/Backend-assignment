@@ -8,8 +8,8 @@
 | A | Equity Market Data | Yahoo Finance (yfinance) | Alpha Vantage | ✅ | Optional |
 | B | Company Fundamentals | Alpha Vantage / SEC EDGAR | Financial Modeling Prep | ✅ | Yes (free) |
 | C | ETF Data | Yahoo Finance | Alpha Vantage | ✅ | Optional |
-| D | Forex & Currency | Frankfurter API (ECB) | ExchangeRate-API | ✅ | No! |
-| E | Cryptocurrency | CoinGecko | CoinMarketCap | ✅ | No (basic) |
+| D | Forex & Currency | Frankfurter (ECB) + Yahoo Finance OHLC | ExchangeRate-API | ✅ | No! |
+| E | Cryptocurrency | CoinGecko + Binance OHLCV | CoinMarketCap | ✅ | No! |
 | F | Commodities | Alpha Vantage / Yahoo Finance | Quandl (Nasdaq) | ✅ | Yes (free) |
 | G | Bonds & Fixed Income | FRED API (US Treasury) | RBI DBIE (India) | ✅ | Yes (free) |
 | H | Indices & Benchmarks | Yahoo Finance | Alpha Vantage | ✅ | Optional |
@@ -90,7 +90,7 @@
 
 ## Category D: Forex & Currency Data ✅ (IMPLEMENTED)
 
-### Source 1: Frankfurter API (Primary — Used in pipeline)
+### Source 1: Frankfurter API (Primary — Used in forex_pipeline)
 - **URL:** https://api.frankfurter.app
 - **Coverage:** 33 currencies (EUR-based, converts all pairs)
 - **Fields:** Base rate, target rate, date, amount
@@ -99,7 +99,19 @@
 - **History:** 1999 onwards (Euro inception)
 - **Commercial Usage:** ✅ Open source, MIT license, free forever
 
-### Source 2: ExchangeRate-API
+### Source 2: Yahoo Finance Chart API (Primary — Used in forex_ohlc_pipeline)
+- **URL:** https://query1.finance.yahoo.com/v8/finance/chart/{TICKER}
+- **Coverage:** 7 major pairs (EUR/USD, GBP/USD, USD/JPY, USD/INR, USD/CAD, AUD/USD, USD/CHF)
+- **Fields:** OHLCV candles (Open, High, Low, Close, Volume) — institutional interbank data
+- **Method:** REST API (JSON), no authentication (User-Agent header recommended)
+- **Update:** Daily candles, near real-time
+- **History:** 1+ year of daily candles
+- **Rate Limits:** No official limit but requires browser-like User-Agent
+- **Twelve Data Match:** < 0.03% variance on close prices ✅
+- **Commercial Usage:** ⚠️ Yahoo TOS restrict commercial redistribution. Use for dev/prototyping.
+- **Pipeline:** `forex_ohlc_pipeline.py` → `forex_ohlcv_daily` table
+
+### Source 3: ExchangeRate-API
 - **URL:** https://www.exchangerate-api.com
 - **Coverage:** 160+ currencies
 - **Fields:** Exchange rates, conversion
@@ -117,7 +129,7 @@
 
 ## Category E: Cryptocurrency ✅ (IMPLEMENTED)
 
-### Source 1: CoinGecko (Primary — Used in pipeline)
+### Source 1: CoinGecko (Used in crypto_pipeline)
 - **URL:** https://api.coingecko.com/api/v3
 - **Coverage:** 13,000+ coins, 600+ exchanges
 - **Fields:** Price, market cap, volume, supply, ATH, price change %, sparklines, OHLC, historical data
@@ -126,7 +138,19 @@
 - **History:** Varies by coin (Bitcoin: 2013+)
 - **Commercial Usage:** ✅ Free for personal, paid for commercial
 
-### Source 2: CoinMarketCap
+### Source 2: Binance Public API (Primary — Used in crypto_ohlcv_pipeline)
+- **URL:** https://api.binance.com/api/v3/klines
+- **Coverage:** 5 major pairs (BTC/USD, ETH/USD, SOL/USD, BNB/USD, XRP/USD)
+- **Fields:** OHLCV klines (Open, High, Low, Close, Volume, Quote Volume)
+- **Method:** REST API (JSON), zero authentication required
+- **Update:** Real-time candle data
+- **History:** 365 daily candles (configurable)
+- **Rate Limits:** 1200 requests/minute (very generous)
+- **Twelve Data Match:** 0.000% variance on Open/High/Low ✅ (Twelve Data sources from Binance)
+- **Commercial Usage:** ✅ Public API, free for data consumption
+- **Pipeline:** `crypto_ohlcv_pipeline.py` → `crypto_ohlcv_daily` table
+
+### Source 3: CoinMarketCap
 - **URL:** https://pro.coinmarketcap.com/api
 - **Coverage:** 10,000+ coins
 - **Free Tier:** 10,000 calls/month, basic endpoints
