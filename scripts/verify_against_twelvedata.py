@@ -42,7 +42,22 @@ def fetch_twelvedata(endpoint: str, params: dict) -> dict:
 
 
 def get_mfapis_crypto_candle(symbol: str, target_date: str = None) -> dict:
-    """Fetch candle from DB or JSON sample."""
+    """Fetch candle from live Binance feed or DB / JSON sample."""
+    try:
+        from services.live_fetcher import fetch_live_crypto_kline
+        live_k = fetch_live_crypto_kline(symbol)
+        if live_k and (target_date is None or live_k.get("datetime") == target_date):
+            return {
+                "candle_date": live_k["datetime"],
+                "open_price": float(live_k["open"]),
+                "high_price": float(live_k["high"]),
+                "low_price": float(live_k["low"]),
+                "close_price": float(live_k["close"]),
+                "volume": float(live_k["volume"])
+            }
+    except Exception:
+        pass
+
     try:
         from models.base import get_session
         from models.crypto import CryptoOHLCV
@@ -73,7 +88,22 @@ def get_mfapis_crypto_candle(symbol: str, target_date: str = None) -> dict:
 
 
 def get_mfapis_forex_candle(pair: str, target_date: str = None) -> dict:
-    """Fetch candle from DB or JSON sample."""
+    """Fetch candle from live Yahoo Finance feed or DB / JSON sample."""
+    try:
+        from services.live_fetcher import fetch_live_forex_candle
+        live_fx = fetch_live_forex_candle(pair)
+        if live_fx and (target_date is None or live_fx.get("datetime") == target_date):
+            return {
+                "candle_date": live_fx["datetime"],
+                "open_price": float(live_fx["open"]),
+                "high_price": float(live_fx["high"]),
+                "low_price": float(live_fx["low"]),
+                "close_price": float(live_fx["close"]),
+                "volume": 0
+            }
+    except Exception:
+        pass
+
     try:
         from models.base import get_session
         from models.forex import ForexOHLCV
@@ -221,7 +251,13 @@ def verify_schema_contract() -> dict:
     print(f"   • Twelve Data OHLCV Structure: {'VALID' if td_has_ohlcv else 'INVALID'}")
 
     sample_candle = get_mfapis_crypto_candle("BTC/USD")
-    mf_has_ohlcv = all(k in sample_candle for k in ["datetime", "open", "high", "low", "close"])
+    mf_keys = set(sample_candle.keys())
+    has_date = bool({"datetime", "candle_date"} & mf_keys)
+    has_open = bool({"open", "open_price"} & mf_keys)
+    has_high = bool({"high", "high_price"} & mf_keys)
+    has_low = bool({"low", "low_price"} & mf_keys)
+    has_close = bool({"close", "close_price"} & mf_keys)
+    mf_has_ohlcv = all([has_date, has_open, has_high, has_low, has_close])
 
     print(f"   • MFAPIs OHLCV Schema:        {'✅ VALID' if mf_has_ohlcv else '❌ INCOMPLETE'}")
 

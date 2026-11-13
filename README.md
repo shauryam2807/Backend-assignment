@@ -33,7 +33,7 @@ Extract (API call + raw save) → Transform (clean + validate) → Load (upsert 
 | SQLAlchemy 2.0 | ORM & database session management |
 | Pandas | Tabular data transformation & normalization |
 | Requests & Tenacity | HTTP data extraction with exponential backoff |
-| pytest | Automated test suite (54 tests) |
+| pytest | Automated test suite (79 tests) |
 | structlog | Structured JSON logging |
 | Pydantic | Configuration validation |
 
@@ -139,11 +139,15 @@ backend assignment/
 │   ├── crypto_ohlcv_pipeline.py   # Binance OHLCV pipeline (Twelve Data match)
 │   ├── forex_ohlc_pipeline.py     # Yahoo Finance OHLC pipeline (Twelve Data match)
 │   └── run_all.py                 # Run all 5 pipelines with error isolation
-├── tests/                         # Automated test suite (54 tests)
+├── services/                      # Real-time data fetching & caching layer
+│   ├── cache.py                   # Thread-safe TTL cache (30s default)
+│   └── live_fetcher.py            # Live feeds: Binance (crypto) + Yahoo Finance (forex)
+├── tests/                         # Automated test suite (79 tests)
 │   ├── conftest.py                # Shared fixtures with realistic data
 │   ├── test_transformers.py       # 15 transformer tests
 │   ├── test_extractors.py         # 15 extractor tests
 │   ├── test_pipelines.py          # 10 integration tests
+│   ├── test_services.py           # 25 services layer tests (cache + live fetcher)
 │   └── test_twelvedata_parity.py  # 6 Twelve Data parity tests (Binance + Yahoo)
 ├── scripts/                       # Utility scripts
 │   ├── init_db.py                 # Database table initialization

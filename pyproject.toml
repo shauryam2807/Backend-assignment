@@ -1,4 +1,13 @@
+[project]
+name = "mfapis"
+version = "1.2.0"
+description = "MFAPIs — Unified Financial Data ETL Platform (Twelve Data Compatible)"
+requires-python = ">=3.10"
+readme = "README.md"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
-
+markers = [
+    "slow: marks tests that require network access or long setup",
+]

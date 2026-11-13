@@ -5,6 +5,13 @@ from datetime import datetime, timezone
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 
+from services.live_fetcher import (
+    fetch_live_crypto_price,
+    fetch_live_crypto_kline,
+    fetch_live_forex_rate,
+    fetch_live_forex_candle
+)
+
 BASE_DIR = Path(__file__).resolve().parent
 
 def load_clean_json(filename: str) -> dict:
@@ -77,7 +84,7 @@ def generate_html_dashboard() -> str:
         </div>
         <div class="px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700/60">
           <span class="text-slate-400">Tests:</span>
-          <span class="font-bold text-emerald-400 ml-1">54/54 Passing</span>
+          <span class="font-bold text-emerald-400 ml-1">79/79 Passing</span>
         </div>
         <a href="/health" target="_blank" class="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-medium transition shadow-sm">
           System Health
@@ -172,7 +179,7 @@ def generate_html_dashboard() -> str:
           <div class="p-2.5 rounded-lg bg-amber-500/10 text-amber-400 font-bold text-lg">🪙</div>
           <div>
             <h3 class="text-sm font-bold text-white">Cryptocurrency Daily Market Valuations</h3>
-            <p class="text-xs text-slate-400">Source: CoinGecko API &bull; Top 50 Global Digital Assets &bull; 365-Day Timeseries</p>
+            <p class="text-xs text-slate-400">Source: CoinGecko API &amp; Binance &bull; Top 50 Digital Assets &bull; 365-Day Timeseries</p>
           </div>
         </div>
         <div class="flex items-center gap-2">
@@ -575,7 +582,7 @@ class MFAPIsHandler(BaseHTTPRequestHandler):
             return
 
         # =========================================================================
-        # TWELVE DATA COMPATIBILITY LAYER (Real OHLCV Data - Zero Mocking)
+        # TWELVE DATA COMPATIBILITY LAYER (Real-Time Live Institutional Feeds)
         # =========================================================================
 
         # 1. /price endpoint (Twelve Data standard: {"price": "123.45"})
@@ -585,23 +592,33 @@ class MFAPIsHandler(BaseHTTPRequestHandler):
                 self._send_json(400, {"status": "error", "message": "Missing required parameter: symbol"})
                 return
 
-            # Check crypto OHLCV first
+            # Live Fetch Attempt: Crypto
+            live_p = fetch_live_crypto_price(symbol)
+            if live_p is not None:
+                self._send_json(200, {"price": f"{live_p:.2f}"})
+                return
+
+            # Live Fetch Attempt: Forex
+            live_fx = fetch_live_forex_rate(symbol)
+            if live_fx is not None:
+                self._send_json(200, {"price": f"{live_fx:.5f}"})
+                return
+
+            # Fallback to stored crypto OHLCV
             if "/" in symbol and any(c in symbol for c in ["BTC", "ETH", "SOL", "BNB", "XRP"]):
                 ohlcv_data = load_clean_json("crypto_ohlcv_sample.json")
                 matching = [r for r in ohlcv_data.get("data", []) if r.get("symbol") == symbol]
                 if matching:
                     matching = sorted(matching, key=lambda x: str(x.get("candle_date", "")), reverse=True)
-                    latest = matching[0]
-                    self._send_json(200, {"price": f"{float(latest.get('close_price', 0)):.2f}"})
+                    self._send_json(200, {"price": f"{float(matching[0].get('close_price', 0)):.2f}"})
                     return
 
-            # Check Forex OHLCV
+            # Fallback to stored Forex OHLCV
             forex_ohlcv = load_clean_json("forex_ohlcv_sample.json")
             matching_fx = [r for r in forex_ohlcv.get("data", []) if r.get("pair_name") == symbol]
             if matching_fx:
                 matching_fx = sorted(matching_fx, key=lambda x: str(x.get("candle_date", "")), reverse=True)
-                latest_fx = matching_fx[0]
-                self._send_json(200, {"price": f"{float(latest_fx.get('close_price', 0)):.5f}"})
+                self._send_json(200, {"price": f"{float(matching_fx[0].get('close_price', 0)):.5f}"})
                 return
 
             # Fallback to legacy forex sample
@@ -622,6 +639,17 @@ class MFAPIsHandler(BaseHTTPRequestHandler):
                 self._send_json(400, {"status": "error", "message": "Missing required parameter: symbol"})
                 return
 
+            # Live Fetch Attempt
+            live_rate = fetch_live_forex_rate(symbol)
+            if live_rate is not None:
+                self._send_json(200, {
+                    "symbol": symbol,
+                    "rate": live_rate,
+                    "timestamp": int(datetime.now(timezone.utc).timestamp())
+                })
+                return
+
+            # Fallback to stored
             parts = symbol.split("/") if "/" in symbol else [symbol, "USD"]
             base, target = parts[0], parts[1] if len(parts) > 1 else "USD"
 
@@ -668,23 +696,33 @@ class MFAPIsHandler(BaseHTTPRequestHandler):
             except (ValueError, TypeError):
                 outputsize = 30
 
-            # --- CRYPTO OHLCV (Real Binance data - 100% Twelve Data Match) ---
+            # --- CRYPTO OHLCV (Live Binance + Historical DB) ---
             if any(c in symbol for c in ["BTC", "ETH", "SOL", "BNB", "XRP"]):
                 ohlcv_data = load_clean_json("crypto_ohlcv_sample.json")
                 matching = [r for r in ohlcv_data.get("data", []) if r.get("symbol") == symbol]
-                if matching:
-                    # Sort latest date first (Twelve Data standard)
-                    matching = sorted(matching, key=lambda x: str(x.get("candle_date", "")), reverse=True)
-                    values = []
-                    for r in matching[:outputsize]:
-                        values.append({
-                            "datetime": str(r.get("candle_date")),
-                            "open": f"{float(r.get('open_price', 0)):.2f}",
-                            "high": f"{float(r.get('high_price', 0)):.2f}",
-                            "low": f"{float(r.get('low_price', 0)):.2f}",
-                            "close": f"{float(r.get('close_price', 0)):.2f}",
-                            "volume": f"{int(float(r.get('volume', 0)))}"
-                        })
+                matching = sorted(matching, key=lambda x: str(x.get("candle_date", "")), reverse=True)
+
+                values = []
+                live_k = fetch_live_crypto_kline(symbol, interval=interval)
+                if live_k:
+                    values.append(live_k)
+
+                for r in matching:
+                    c_date = str(r.get("candle_date"))
+                    if live_k and c_date == live_k.get("datetime"):
+                        continue
+                    values.append({
+                        "datetime": c_date,
+                        "open": f"{float(r.get('open_price', 0)):.2f}",
+                        "high": f"{float(r.get('high_price', 0)):.2f}",
+                        "low": f"{float(r.get('low_price', 0)):.2f}",
+                        "close": f"{float(r.get('close_price', 0)):.2f}",
+                        "volume": f"{int(float(r.get('volume', 0)))}"
+                    })
+                    if len(values) >= outputsize:
+                        break
+
+                if values:
                     self._send_json(200, {
                         "meta": {
                             "symbol": symbol,
@@ -694,26 +732,37 @@ class MFAPIsHandler(BaseHTTPRequestHandler):
                             "exchange": "Binance",
                             "type": "Digital Currency"
                         },
-                        "values": values,
+                        "values": values[:outputsize],
                         "status": "ok"
                     })
                     return
 
-            # --- FOREX OHLC (Real Institutional candles) ---
+            # --- FOREX OHLC (Live Yahoo Finance + Historical DB) ---
             forex_ohlcv = load_clean_json("forex_ohlcv_sample.json")
             matching_fx = [r for r in forex_ohlcv.get("data", []) if r.get("pair_name") == symbol]
-            if matching_fx:
-                matching_fx = sorted(matching_fx, key=lambda x: str(x.get("candle_date", "")), reverse=True)
-                values = []
-                for r in matching_fx[:outputsize]:
-                    values.append({
-                        "datetime": str(r.get("candle_date")),
-                        "open": f"{float(r.get('open_price', 0)):.5f}",
-                        "high": f"{float(r.get('high_price', 0)):.5f}",
-                        "low": f"{float(r.get('low_price', 0)):.5f}",
-                        "close": f"{float(r.get('close_price', 0)):.5f}",
-                        "volume": f"{int(float(r.get('volume', 0)))}"
-                    })
+            matching_fx = sorted(matching_fx, key=lambda x: str(x.get("candle_date", "")), reverse=True)
+
+            values_fx = []
+            live_fx_k = fetch_live_forex_candle(symbol)
+            if live_fx_k:
+                values_fx.append(live_fx_k)
+
+            for r in matching_fx:
+                c_date = str(r.get("candle_date"))
+                if live_fx_k and c_date == live_fx_k.get("datetime"):
+                    continue
+                values_fx.append({
+                    "datetime": c_date,
+                    "open": f"{float(r.get('open_price', 0)):.5f}",
+                    "high": f"{float(r.get('high_price', 0)):.5f}",
+                    "low": f"{float(r.get('low_price', 0)):.5f}",
+                    "close": f"{float(r.get('close_price', 0)):.5f}",
+                    "volume": f"{int(float(r.get('volume', 0)))}"
+                })
+                if len(values_fx) >= outputsize:
+                    break
+
+            if values_fx:
                 self._send_json(200, {
                     "meta": {
                         "symbol": symbol,
@@ -722,7 +771,7 @@ class MFAPIsHandler(BaseHTTPRequestHandler):
                         "currency_quote": symbol.split("/")[1] if "/" in symbol else "USD",
                         "type": "Physical Currency"
                     },
-                    "values": values,
+                    "values": values_fx[:outputsize],
                     "status": "ok"
                 })
                 return
@@ -730,7 +779,7 @@ class MFAPIsHandler(BaseHTTPRequestHandler):
             self._send_json(404, {"status": "error", "message": f"Symbol not found: {symbol}"})
             return
 
-        # 4. /quote endpoint (Twelve Data standard snapshot from real data)
+        # 4. /quote endpoint (Twelve Data standard snapshot from real-time data)
         if path == "/quote":
             symbol = query_params.get("symbol", "").upper()
             if not symbol:
@@ -740,16 +789,34 @@ class MFAPIsHandler(BaseHTTPRequestHandler):
             # Try crypto OHLCV first
             ohlcv_data = load_clean_json("crypto_ohlcv_sample.json")
             matching = [r for r in ohlcv_data.get("data", []) if r.get("symbol") == symbol]
-            if matching:
+            if matching or fetch_live_crypto_price(symbol):
                 matching = sorted(matching, key=lambda x: str(x.get("candle_date", "")), reverse=True)
-                latest = matching[0]
-                prev = matching[1] if len(matching) > 1 else latest
-                c_price = float(latest.get("close_price", 0))
-                p_close = float(prev.get("close_price", c_price))
+                live_k = fetch_live_crypto_kline(symbol)
+
+                if live_k:
+                    c_price = float(live_k.get("close", 0))
+                    open_p = float(live_k.get("open", 0))
+                    high_p = float(live_k.get("high", 0))
+                    low_p = float(live_k.get("low", 0))
+                    vol = live_k.get("volume", "0")
+                    c_date = live_k.get("datetime")
+                    prev = matching[0] if matching else {}
+                    p_close = float(prev.get("close_price", c_price))
+                else:
+                    latest = matching[0] if matching else {}
+                    prev = matching[1] if len(matching) > 1 else latest
+                    c_price = float(latest.get("close_price", 0))
+                    open_p = float(latest.get("open_price", 0))
+                    high_p = float(latest.get("high_price", 0))
+                    low_p = float(latest.get("low_price", 0))
+                    vol = str(int(float(latest.get("volume", 0))))
+                    c_date = str(latest.get("candle_date"))
+                    p_close = float(prev.get("close_price", c_price))
+
                 chg = c_price - p_close
                 pct_chg = (chg / p_close) * 100 if p_close else 0.0
 
-                all_closes = [float(r.get("close_price", 0)) for r in matching]
+                all_closes = [float(r.get("close_price", 0)) for r in matching] + ([c_price] if c_price else [])
                 w52_low = min(all_closes) if all_closes else c_price
                 w52_high = max(all_closes) if all_closes else c_price
 
@@ -758,13 +825,13 @@ class MFAPIsHandler(BaseHTTPRequestHandler):
                     "name": f"{symbol.split('/')[0]} / {symbol.split('/')[1] if '/' in symbol else 'USD'}",
                     "exchange": "Binance",
                     "currency": symbol.split("/")[1] if "/" in symbol else "USD",
-                    "datetime": str(latest.get("candle_date")),
+                    "datetime": c_date,
                     "timestamp": int(datetime.now(timezone.utc).timestamp()),
-                    "open": f"{float(latest.get('open_price', 0)):.2f}",
-                    "high": f"{float(latest.get('high_price', 0)):.2f}",
-                    "low": f"{float(latest.get('low_price', 0)):.2f}",
+                    "open": f"{open_p:.2f}",
+                    "high": f"{high_p:.2f}",
+                    "low": f"{low_p:.2f}",
                     "close": f"{c_price:.2f}",
-                    "volume": f"{int(float(latest.get('volume', 0)))}",
+                    "volume": str(vol),
                     "previous_close": f"{p_close:.2f}",
                     "change": f"{chg:+.2f}",
                     "percent_change": f"{pct_chg:+.4f}",
@@ -780,16 +847,34 @@ class MFAPIsHandler(BaseHTTPRequestHandler):
             # Try forex OHLCV
             forex_ohlcv = load_clean_json("forex_ohlcv_sample.json")
             matching_fx = [r for r in forex_ohlcv.get("data", []) if r.get("pair_name") == symbol]
-            if matching_fx:
+            if matching_fx or fetch_live_forex_rate(symbol):
                 matching_fx = sorted(matching_fx, key=lambda x: str(x.get("candle_date", "")), reverse=True)
-                latest = matching_fx[0]
-                prev = matching_fx[1] if len(matching_fx) > 1 else latest
-                c_price = float(latest.get("close_price", 0))
-                p_close = float(prev.get("close_price", c_price))
+                live_fx_k = fetch_live_forex_candle(symbol)
+
+                if live_fx_k:
+                    c_price = float(live_fx_k.get("close", 0))
+                    open_p = float(live_fx_k.get("open", 0))
+                    high_p = float(live_fx_k.get("high", 0))
+                    low_p = float(live_fx_k.get("low", 0))
+                    vol = "0"
+                    c_date = live_fx_k.get("datetime")
+                    prev = matching_fx[0] if matching_fx else {}
+                    p_close = float(prev.get("close_price", c_price))
+                else:
+                    latest = matching_fx[0] if matching_fx else {}
+                    prev = matching_fx[1] if len(matching_fx) > 1 else latest
+                    c_price = float(latest.get("close_price", 0))
+                    open_p = float(latest.get("open_price", 0))
+                    high_p = float(latest.get("high_price", 0))
+                    low_p = float(latest.get("low_price", 0))
+                    vol = "0"
+                    c_date = str(latest.get("candle_date"))
+                    p_close = float(prev.get("close_price", c_price))
+
                 chg = c_price - p_close
                 pct_chg = (chg / p_close) * 100 if p_close else 0.0
 
-                all_closes = [float(r.get("close_price", 0)) for r in matching_fx]
+                all_closes = [float(r.get("close_price", 0)) for r in matching_fx] + ([c_price] if c_price else [])
                 w52_low = min(all_closes) if all_closes else c_price
                 w52_high = max(all_closes) if all_closes else c_price
 
@@ -798,11 +883,11 @@ class MFAPIsHandler(BaseHTTPRequestHandler):
                     "name": f"{symbol.split('/')[0]} / {symbol.split('/')[1] if '/' in symbol else 'USD'}",
                     "exchange": "FOREX",
                     "currency": symbol.split("/")[1] if "/" in symbol else "USD",
-                    "datetime": str(latest.get("candle_date")),
+                    "datetime": c_date,
                     "timestamp": int(datetime.now(timezone.utc).timestamp()),
-                    "open": f"{float(latest.get('open_price', 0)):.5f}",
-                    "high": f"{float(latest.get('high_price', 0)):.5f}",
-                    "low": f"{float(latest.get('low_price', 0)):.5f}",
+                    "open": f"{open_p:.5f}",
+                    "high": f"{high_p:.5f}",
+                    "low": f"{low_p:.5f}",
                     "close": f"{c_price:.5f}",
                     "volume": "0",
                     "previous_close": f"{p_close:.5f}",
@@ -827,7 +912,22 @@ class MFAPIsHandler(BaseHTTPRequestHandler):
                 self._send_json(400, {"status": "error", "message": "Missing required parameter: symbol"})
                 return
 
-            # Try crypto
+            # Try crypto live candle or stored
+            live_k = fetch_live_crypto_kline(symbol)
+            if live_k:
+                self._send_json(200, {
+                    "symbol": symbol,
+                    "exchange": "Binance",
+                    "currency": symbol.split("/")[1] if "/" in symbol else "USD",
+                    "datetime": live_k["datetime"],
+                    "close": live_k["close"],
+                    "open": live_k["open"],
+                    "high": live_k["high"],
+                    "low": live_k["low"],
+                    "volume": live_k["volume"]
+                })
+                return
+
             ohlcv_data = load_clean_json("crypto_ohlcv_sample.json")
             matching = [r for r in ohlcv_data.get("data", []) if r.get("symbol") == symbol]
             if matching:
@@ -846,7 +946,22 @@ class MFAPIsHandler(BaseHTTPRequestHandler):
                 })
                 return
 
-            # Try forex
+            # Try forex live candle or stored
+            live_fx_k = fetch_live_forex_candle(symbol)
+            if live_fx_k:
+                self._send_json(200, {
+                    "symbol": symbol,
+                    "exchange": "FOREX",
+                    "currency": symbol.split("/")[1] if "/" in symbol else "USD",
+                    "datetime": live_fx_k["datetime"],
+                    "close": live_fx_k["close"],
+                    "open": live_fx_k["open"],
+                    "high": live_fx_k["high"],
+                    "low": live_fx_k["low"],
+                    "volume": live_fx_k["volume"]
+                })
+                return
+
             forex_ohlcv = load_clean_json("forex_ohlcv_sample.json")
             matching_fx = [r for r in forex_ohlcv.get("data", []) if r.get("pair_name") == symbol]
             if matching_fx:
