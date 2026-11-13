@@ -107,6 +107,10 @@ python -m pytest tests/ -v --cov=. --cov-report=term-missing
 
 ```
 backend assignment/
+├── .github/                       # GitHub Actions CI/CD & Automation
+│   └── workflows/
+│       ├── daily_etl.yml          # Daily Cron ETL pipeline (00:00 UTC)
+│       └── ci.yml                 # Automated test runner on push/PR
 ├── config/                        # Settings and structured logging setup
 │   ├── settings.py                # Centralized config (DB, APIs, Binance, Yahoo Finance)
 │   └── logging_config.py          # structlog JSON logging setup
@@ -252,3 +256,13 @@ Verified using `scripts/verify_against_twelvedata.py` against live Twelve Data A
 | [API Design](docs/api_design.md) | REST API endpoints with request/response examples |
 | [Data Quality](docs/data_quality.md) | Validation pipeline, quality metrics, monitoring framework |
 | [Licensing](docs/licensing.md) | Source licensing, attribution requirements, compliance checklist |
+
+## 🤖 Automation & CI/CD
+
+The platform includes production-grade GitHub Actions workflows for continuous integration and automated pipeline scheduling:
+
+| Workflow | Trigger | Description |
+|----------|---------|-------------|
+| **Daily ETL Pipeline** (`daily_etl.yml`) | `cron: '0 0 * * *'` (Daily at 00:00 UTC) + `workflow_dispatch` | Automatically provisions a PostgreSQL 17 service container, executes all 5 ETL pipelines, runs the full test suite, and uploads output artifacts |
+| **CI Test Suite** (`ci.yml`) | `push`, `pull_request` | Matrix testing across Python 3.10, 3.11, and 3.12 with test coverage reports and server verification |
+
