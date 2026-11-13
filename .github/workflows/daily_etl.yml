@@ -8,49 +8,18 @@
 # Manual:   Can be triggered manually from GitHub Actions tab
 # =============================================================================
 
-name: 📊 Daily ETL Pipeline
+name: Daily ETL Pipeline
 
 on:
-  # ─── CRON SCHEDULER ───────────────────────────────────────────────────
-  # Runs every day at midnight UTC (5:30 AM IST)
-  # ┌───────────── minute (0)
-  # │ ┌───────────── hour (0 = midnight UTC)
-  # │ │ ┌───────────── day of month (every day)
-  # │ │ │ ┌───────────── month (every month)
-  # │ │ │ │ ┌───────────── day of week (every day)
-  # │ │ │ │ │
   schedule:
     - cron: '0 0 * * *'
-
-  # ─── MANUAL TRIGGER ───────────────────────────────────────────────────
-  # Allows running from GitHub UI: Actions tab → "Daily ETL Pipeline" → "Run workflow"
   workflow_dispatch:
-    inputs:
-      pipeline:
-        description: 'Which pipeline to run'
-        required: false
-        default: 'all'
-        type: choice
-        options:
-          - all
-          - forex
-          - crypto
-          - economic
-          - crypto_ohlcv
-          - forex_ohlc
-
-env:
-  PYTHON_VERSION: '3.11'
 
 jobs:
-  # ═══════════════════════════════════════════════════════════════════════
-  # JOB 1: Run ETL Pipelines
-  # ═══════════════════════════════════════════════════════════════════════
   etl-pipeline:
-    name: 🔄 Run ETL Pipelines
+    name: Run ETL Pipelines
     runs-on: ubuntu-latest
 
-    # PostgreSQL service container for database operations
     services:
       postgres:
         image: postgres:17
@@ -67,72 +36,57 @@ jobs:
           --health-retries=5
 
     steps:
-      # ─── Setup ────────────────────────────────────────────────────────
-      - name: 📥 Checkout Repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: 🐍 Setup Python ${{ env.PYTHON_VERSION }}
+      - name: Setup Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version: '3.11'
           cache: 'pip'
 
-      - name: 📦 Install Dependencies
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # ─── Database Setup ───────────────────────────────────────────────
-      - name: 🗄️ Initialize Database Tables
+      - name: Initialize Database Tables
         env:
           DATABASE_URL: postgresql+psycopg2://postgres:postgres@localhost:5432/mfapis_db
         run: |
           python -m scripts.init_db
 
-      # ─── Pipeline Execution ───────────────────────────────────────────
-      - name: 🚀 Run ETL Pipelines
+      - name: Run All ETL Pipelines
         env:
           DATABASE_URL: postgresql+psycopg2://postgres:postgres@localhost:5432/mfapis_db
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: |
-          PIPELINE="${{ github.event.inputs.pipeline || 'all' }}"
+          echo "========================================="
+          echo "  Running ALL 5 ETL Pipelines"
+          echo "========================================="
+          python -m pipelines.run_all
 
-          if [ "$PIPELINE" = "all" ]; then
-            echo "═══════════════════════════════════════════"
-            echo "  Running ALL 5 ETL Pipelines"
-            echo "═══════════════════════════════════════════"
-            python -m pipelines.run_all
-          else
-            echo "Running pipeline: $PIPELINE"
-            python -m pipelines.${PIPELINE}_pipeline
-          fi
-
-      # ─── Verification ────────────────────────────────────────────────
-      - name: ✅ Run Test Suite
+      - name: Run Test Suite
         env:
           DATABASE_URL: postgresql+psycopg2://postgres:postgres@localhost:5432/mfapis_db
         run: |
           python -m pytest tests/ -v --tb=short
 
-      - name: 📊 Pipeline Summary
+      - name: Pipeline Summary
         if: always()
         run: |
-          echo "## 📊 ETL Pipeline Run Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## ETL Pipeline Run Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Detail | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
           echo "| **Trigger** | ${{ github.event_name }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Pipeline** | ${{ github.event.inputs.pipeline || 'all' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| **Time (UTC)** | $(date -u '+%Y-%m-%d %H:%M:%S') |" >> $GITHUB_STEP_SUMMARY
           echo "| **Branch** | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Commit** | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
 
-      # ─── Upload Output Artifacts ──────────────────────────────────────
-      - name: 📁 Upload Pipeline Output
+      - name: Upload Pipeline Output
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: pipeline-output-${{ github.run_number }}
           path: output/
           retention-days: 30
-
