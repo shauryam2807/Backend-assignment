@@ -110,7 +110,12 @@ backend assignment/
 ├── .github/                       # GitHub Actions CI/CD & Automation
 │   └── workflows/
 │       ├── daily_etl.yml          # Daily Cron ETL pipeline (00:00 UTC)
-│       └── ci.yml                 # Automated test runner on push/PR
+│       ├── ci.yml                 # Automated test runner on push/PR
+│       └── nodejs-ci.yml          # Node.js API test runner on push/PR
+├── nodejs-api/                    # Node.js (Express) REST API (Twelve Data Compatible)
+│   ├── src/                       # MVC architecture (routes, controllers, models, services)
+│   ├── tests/                     # 17 automated Jest/Supertest API tests
+│   └── package.json               # Node.js dependencies
 ├── config/                        # Settings and structured logging setup
 │   ├── settings.py                # Centralized config (DB, APIs, Binance, Yahoo Finance)
 │   └── logging_config.py          # structlog JSON logging setup
@@ -265,4 +270,5 @@ The platform includes production-grade GitHub Actions workflows for continuous i
 |----------|---------|-------------|
 | **Daily ETL Pipeline** (`daily_etl.yml`) | `cron: '0 0 * * *'` (Daily at 00:00 UTC) + `workflow_dispatch` | Automatically provisions a PostgreSQL 17 service container, executes all 5 ETL pipelines, runs the full test suite, and uploads output artifacts |
 | **CI Test Suite** (`ci.yml`) | `push`, `pull_request` | Matrix testing across Python 3.10, 3.11, and 3.12 with test coverage reports and server verification |
+| **Node.js API Tests** (`nodejs-ci.yml`) | `push`, `pull_request` (nodejs-api/) | Matrix testing across Node.js 18, 20, and 22 with PostgreSQL service container |
 

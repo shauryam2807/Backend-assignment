@@ -37,7 +37,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Python 3.11
         uses: actions/setup-python@v5
@@ -80,12 +80,14 @@ jobs:
           echo "| Detail | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
           echo "| **Trigger** | ${{ github.event_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Pipeline** | all |" >> $GITHUB_STEP_SUMMARY
           echo "| **Time (UTC)** | $(date -u '+%Y-%m-%d %H:%M:%S') |" >> $GITHUB_STEP_SUMMARY
           echo "| **Branch** | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Commit** | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload Pipeline Output
         if: success()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: pipeline-output-${{ github.run_number }}
           path: output/

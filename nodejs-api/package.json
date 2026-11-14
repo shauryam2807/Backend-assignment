@@ -1,0 +1,47 @@
+{
+  "name": "mfapis-nodejs-api",
+  "version": "2.0.0",
+  "description": "Twelve Data Compatible Financial API Platform in Node.js — Institutional Real-Time & Historical Data",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest --verbose --runInBand --forceExit",
+    "test:coverage": "jest --verbose --runInBand --forceExit --coverage"
+  },
+  "keywords": [
+    "financial-data",
+    "twelve-data",
+    "api",
+    "crypto",
+    "forex",
+    "ohlcv",
+    "binance",
+    "express"
+  ],
+  "author": "Shauryam",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shauryam2807/Backend-assignment"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "morgan": "^1.10.0",
+    "node-cache": "^5.1.2",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.9",
+    "supertest": "^7.0.0"
+  }
+}

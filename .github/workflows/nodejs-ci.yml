@@ -1,0 +1,73 @@
+# =============================================================================
+# Node.js API - Continuous Integration
+# =============================================================================
+# Runs the Node.js test suite on every push and pull request to ensure
+# API contract integrity and prevent regressions.
+# =============================================================================
+
+name: Node.js API Tests
+
+on:
+  push:
+    branches: [main, master, develop]
+    paths:
+      - 'nodejs-api/**'
+  pull_request:
+    branches: [main, master]
+    paths:
+      - 'nodejs-api/**'
+
+jobs:
+  test:
+    name: Run Tests (Node.js ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: ['18', '20', '22']
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mfapis_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: nodejs-api/package-lock.json
+
+      - name: Install Dependencies
+        working-directory: nodejs-api
+        run: npm ci
+
+      - name: Run Test Suite
+        working-directory: nodejs-api
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mfapis_db
+          NODE_ENV: test
+        run: npm test
+
+      - name: Test Summary
+        if: always()
+        run: |
+          echo "## Node.js API Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Node.js Version:** ${{ matrix.node-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+
