@@ -26,6 +26,12 @@ describe('Live Fetcher & Symbol Resolution', () => {
     expect(getForexTicker('USD/JPY')).toBe('USDJPY=X');
   });
 
+  test('Crypto symbols MUST NEVER resolve to Yahoo Forex tickers (Crypto Guard)', () => {
+    expect(getForexTicker('BTC/USD')).toBeNull();
+    expect(getForexTicker('ETH/USD')).toBeNull();
+    expect(getForexTicker('SOL/USD')).toBeNull();
+  });
+
   test('Cache set and get works with TTL', () => {
     cache.set('test_key', 12345, 10);
     expect(cache.get('test_key')).toBe(12345);

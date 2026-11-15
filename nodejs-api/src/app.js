@@ -13,13 +13,14 @@ const twelvedataRoutes = require('./routes/twelvedata.routes');
 const referenceRoutes = require('./routes/reference.routes');
 const legacyRoutes = require('./routes/legacy.routes');
 const errorHandler = require('./middleware/errorHandler');
+const { getDashboardHtml } = require('./views/dashboard.html');
 
 const app = express();
 
 // ---------------------------------------------------------------------------
 // Security Middleware
 // ---------------------------------------------------------------------------
-app.use(helmet());                           // Set secure HTTP headers (XSS, CSP, etc.)
+app.use(helmet({ contentSecurityPolicy: false })); // Set secure headers, allow dashboard CDNs
 app.use(cors());                             // Allow cross-origin requests
 
 // ---------------------------------------------------------------------------
@@ -29,11 +30,12 @@ const logFormat = process.env.NODE_ENV === 'production' ? 'combined' : 'dev';
 app.use(morgan(logFormat));
 
 // ---------------------------------------------------------------------------
-// Rate Limiting (100 requests per 15-minute window per IP)
+// Rate Limiting (Protects API from spam while allowing smooth UI auto-refresh)
 // ---------------------------------------------------------------------------
+const maxRequests = process.env.NODE_ENV === 'production' ? 500 : 5000;
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: maxRequests,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -65,16 +67,26 @@ app.use((req, res, next) => {
 });
 
 // ---------------------------------------------------------------------------
-// Root Endpoint
+// Root & UI Dashboard Endpoint
 // ---------------------------------------------------------------------------
+// Serves interactive Financial Trading Terminal UI when requested in a browser
+// Serves JSON metadata when called by APIs, curl, or automated test runners
 app.get('/', (req, res) => {
+  if (req.headers.accept && req.headers.accept.includes('text/html')) {
+    return res.send(getDashboardHtml());
+  }
   res.json({
     name: 'MFAPIs Financial Data Platform (Node.js)',
     version: '2.0.0',
     documentation: '/health',
+    dashboard: '/dashboard',
     description: 'Twelve Data Compatible Institutional Financial Data REST API',
     github: 'https://github.com/shauryam2807/Backend-assignment',
   });
+});
+
+app.get('/dashboard', (req, res) => {
+  res.send(getDashboardHtml());
 });
 
 // ---------------------------------------------------------------------------

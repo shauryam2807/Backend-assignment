@@ -52,6 +52,13 @@ function getBinanceTicker(symbol) {
 function getForexTicker(pair) {
   if (!pair) return null;
   const clean = pair.toUpperCase().trim();
+  // Crypto Guard: Reject crypto symbols so they never hit Yahoo Forex
+  if (CRYPTO_MAP[clean]) return null;
+  const cryptoBases = ['BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'DOGE', 'ADA', 'AVAX', 'DOT', 'LINK'];
+  if (clean.includes('/')) {
+    const [base] = clean.split('/');
+    if (cryptoBases.includes(base)) return null;
+  }
   if (FOREX_MAP[clean]) return FOREX_MAP[clean];
   if (clean.includes('/')) {
     const [base, target] = clean.split('/');
